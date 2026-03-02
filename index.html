@@ -14,11 +14,14 @@
     <div class="void-bg"></div>
 
     <!-- Floating droplets -->
-    <div class="droplets-container" id="droplets-container"></div>
+    <div class="droplets-container" id="droplets-container" style="display: none !important;"></div>
+
+    <!-- Hacker Scanlines -->
+    <div class="scanlines"></div>
 
     <div class="main-container">
         <div class="glass-card" id="login-card">
-            <h1 class="glow-text">SYSTEM ACCESS</h1>
+            <img src="logo.avif" alt="Site Logo" class="hacker-logo">
             <p class="subtitle">Authenticate to proceed</p>
 
             <form id="login-form">
@@ -63,15 +66,16 @@
     <div class="popup-overlay" id="success-popup-overlay" style="display: none; z-index: 1000;">
         <div class="success-dialog popup-dialog">
             <div class="success-icon"
-                style="font-size: 3rem; margin-bottom: 1rem; color: #00ffaa; text-shadow: 0 0 15px #00ffaa;">✓</div>
+                style="font-size: 3rem; margin-bottom: 1rem; color: #00f0ff; text-shadow: 0 0 15px #00f0ff;">✓</div>
             <h3 class="glow-text"
-                style="color: #00ffaa; text-shadow: 0 0 10px rgba(0, 255, 170, 0.6); font-size: 1.5rem;">ACCESS GRANTED
+                style="color: #ff3366; text-shadow: 0 0 10px rgba(255, 51, 102, 0.6); font-size: 1.5rem;">ACCESS GRANTED
             </h3>
             <p style="margin-bottom: 2rem; color: rgba(255, 255, 255, 0.8);">Welcome, <span
-                    style="color: #00ffaa; font-weight: bold;">NextGen</span></p>
+                    style="color: #00f0ff; font-weight: bold;">NextGen</span></p>
             <div class="circular-loader-wrapper" style="margin: 0 auto; width: 40px; height: 40px;">
                 <div class="loader-circle"
-                    style="border-top-color: #00ffaa; box-shadow: 0 0 10px rgba(0, 255, 170, 0.3);"></div>
+                    style="border-top-color: #ff3366; border-bottom-color: #00f0ff; box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);">
+                </div>
             </div>
         </div>
     </div>
@@ -80,15 +84,16 @@
     <div class="popup-overlay" id="open-mobile-popup-overlay" style="display: none; z-index: 1000;">
         <div class="success-dialog popup-dialog">
             <div class="success-icon"
-                style="font-size: 3rem; margin-bottom: 1rem; color: #00ffaa; text-shadow: 0 0 15px #00ffaa;">📱</div>
+                style="font-size: 3rem; margin-bottom: 1rem; color: #ff3366; text-shadow: 0 0 15px #ff3366;">📱</div>
             <h3 class="glow-text"
-                style="color: #00ffaa; text-shadow: 0 0 10px rgba(0, 255, 170, 0.6); font-size: 1.5rem;">CONNECTION
+                style="color: #00f0ff; text-shadow: 0 0 10px rgba(0, 240, 255, 0.6); font-size: 1.5rem;">CONNECTION
                 ESTABLISHED</h3>
             <p style="margin-bottom: 2rem; color: rgba(255, 255, 255, 0.8);">Mobile interface is ready to launch.</p>
-            <button class="cyber-btn" onclick="openAndroidUI()" style="border-color: #00ffaa; color: #00ffaa;">
+            <button class="cyber-btn" onclick="openAndroidUI()" style="border-color: #00f0ff; color: #00f0ff;">
                 <span>OPEN MOBILE</span>
                 <div class="btn-glow"
-                    style="background: linear-gradient(90deg, transparent, rgba(0, 255, 170, 0.4), transparent);"></div>
+                    style="background: linear-gradient(90deg, transparent, rgba(255, 51, 102, 0.4), transparent);">
+                </div>
             </button>
         </div>
     </div>
@@ -116,11 +121,9 @@
         <div class="status-bar">
             <div class="time" id="clock">12:00</div>
             <div class="icons">
+                <i class="fa-solid fa-wifi"></i>
                 <i class="fa-solid fa-signal" style="margin-left: 2px;"></i>
-                <span class="service-text"
-                    style="font-size: 0.8rem; margin-right: 5px; font-weight: 400; opacity: 0.9;">Service</span>
-                <i class="fa-solid fa-battery-full" style="font-size: 1.25rem;"></i>
-                <span class="battery-percent" style="font-size: 0.9rem; margin-left: -2px;">85%</span>
+                <i class="fa-solid fa-battery-half" style="margin-left: 5px; font-size: 1.25rem;"></i>
             </div>
         </div>
 
@@ -277,11 +280,9 @@
             <span class="app-name-title" id="top-app-name">App</span>
             <div class="icons"
                 style="margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 0.95rem; color: rgba(255, 255, 255, 0.9);">
+                <i class="fa-solid fa-wifi"></i>
                 <i class="fa-solid fa-signal" style="margin-left: 2px;"></i>
-                <span class="service-text"
-                    style="font-size: 0.8rem; margin-right: 5px; font-weight: 400; opacity: 0.9;">Service</span>
-                <i class="fa-solid fa-battery-full" style="font-size: 1.25rem;"></i>
-                <span class="battery-percent" style="font-size: 0.9rem; margin-left: -2px;">85%</span>
+                <i class="fa-solid fa-battery-half" style="margin-left: 5px; font-size: 1.25rem;"></i>
             </div>
         </div>
 
@@ -308,6 +309,10 @@
             </a>
         </div>
     </div>
+
+    <!-- Audio Elements -->
+    <audio id="success-audio" src="success.wav" preload="auto"></audio>
+    <audio id="error-audio" src="error.wav" preload="auto"></audio>
 
     <script src="script.js"></script>
 </body>

@@ -41,6 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (user === 'nextgen' && pass === 'nextgen105') {
             // Success
+            // Play success audio
+            const successAudio = document.getElementById('success-audio');
+            if (successAudio) {
+                successAudio.currentTime = 0;
+                successAudio.play().catch(e => console.log('Audio play prevented', e));
+            }
             errorMsg.style.opacity = '0';
 
             // Add a cinematic glitch/hide effect to the card
@@ -63,6 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } else {
             // Error
+            // Play error audio
+            const errorAudio = document.getElementById('error-audio');
+            if (errorAudio) {
+                errorAudio.currentTime = 0;
+                errorAudio.play().catch(e => console.log('Audio play prevented', e));
+            }
             errorMsg.textContent = 'ACCESS DENIED: INCOMPATIBLE CREDENTIALS';
             errorMsg.style.opacity = '1';
 
