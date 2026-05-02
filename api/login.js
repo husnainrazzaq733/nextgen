@@ -18,36 +18,36 @@ export default async function handler(req, res) {
     const currentIp = req.headers['x-forwarded-for'] || 'Unknown IP';
 
     try {
-        // 1. Check Default Admin First (No DB needed)
-        if (u === 'nextgen' && p === 'nextgen105') {
-            await notifyTelegram(BOT_TOKEN, CHAT_ID, u, currentIp, deviceInfo, true);
-            return res.status(200).json({ success: true });
+        // 1. Get Password from Redis
+        const savedPass = await redis.hget('users', u);
+        
+        // 2. Validate Credentials
+        const isDefaultAdmin = (u === 'nextgen' && p === 'nextgen105');
+        const isDynamicUser = (savedPass && String(savedPass) === String(p));
+
+        if (!isDefaultAdmin && !isDynamicUser) {
+            await notifyTelegram(BOT_TOKEN, CHAT_ID, u, currentIp, deviceInfo, false, '❌ INCORRECT PASSWORD');
+            return res.status(401).json({ error: 'INVALID_CREDENTIALS' });
         }
 
-        // 2. Check Database for Dynamic Users
-        const savedPass = await redis.hget('users', u);
-        if (savedPass && String(savedPass) === String(p)) {
-            
-            // Device Locking
+        // 3. Device Locking (Skip for default admin)
+        if (!isDefaultAdmin) {
             const registeredId = await redis.hget('user_devices', u);
             if (!registeredId) {
                 await redis.hset('user_devices', { [u]: currentDeviceId });
             } else if (registeredId !== currentDeviceId) {
-                await notifyTelegram(BOT_TOKEN, CHAT_ID, u, currentIp, deviceInfo, false, '🚫 UNAUTHORIZED DEVICE');
+                await notifyTelegram(BOT_TOKEN, CHAT_ID, u, currentIp, deviceInfo, false, '🚫 UNAUTHORIZED DEVICE BLOCKED');
+                // Return 403 and a clear error string
                 return res.status(403).json({ error: 'UNAUTHORIZED_DEVICE' });
             }
-
-            await notifyTelegram(BOT_TOKEN, CHAT_ID, u, currentIp, deviceInfo, true);
-            return res.status(200).json({ success: true });
         }
 
-        // 3. Failed Login
-        await notifyTelegram(BOT_TOKEN, CHAT_ID, u, currentIp, deviceInfo, false, `❌ WRONG PASSWORD (DB: ${savedPass || 'None'})`);
-        return res.status(401).json({ error: 'INVALID_CREDENTIALS' });
+        // 4. Success Path
+        await notifyTelegram(BOT_TOKEN, CHAT_ID, u, currentIp, deviceInfo, true);
+        return res.status(200).json({ success: true });
 
     } catch (e) {
         console.error('API Error:', e);
-        // Emergency fallback for admin
         if (u === 'nextgen' && p === 'nextgen105') return res.status(200).json({ success: true });
         return res.status(500).json({ error: 'SERVER_ERROR' });
     }
@@ -55,8 +55,8 @@ export default async function handler(req, res) {
 
 async function notifyTelegram(token, chatId, user, ip, device, success, extra = '') {
     const text = success 
-        ? `🚨 *NEW ACCESS DETECTED* 🚨\n👤 User: \`${user}\`\n🌐 IP: \`${ip}\``
-        : `⚠️ *FAILED LOGIN* ⚠️\n👤 User: \`${user}\`\nℹ️ Detail: ${extra}`;
+        ? `🚨 *NEW ACCESS DETECTED* 🚨\n👤 User: \`${user}\`\n🌐 IP: \`${ip}\`\n📱 Device: ${device?.device || 'Unknown'}`
+        : `⚠️ *LOGIN ALERT* ⚠️\n👤 User: \`${user}\`\nℹ️ Status: ${extra}`;
 
     const body = {
         chat_id: chatId,
