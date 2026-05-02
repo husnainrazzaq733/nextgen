@@ -139,19 +139,21 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 // If not OK, handle specific error codes
                 const errorAudio = document.getElementById('error-audio');
-                if (errorAudio) {
-                    errorAudio.currentTime = 0;
-                    errorAudio.play().catch(e => console.log('Audio blocked', e));
-                }
 
                 if (response.status === 403 || data.error === 'UNAUTHORIZED_DEVICE') {
                     document.getElementById('popup-error-title').textContent = 'UNAUTHORIZED DEVICE';
                     document.getElementById('popup-error-desc').textContent = 'This device is not registered to your account.';
                     document.getElementById('popup-error-title').style.color = '#ff4444';
+                    // Voice is muted for unauthorized device to avoid 'wrong password' audio
                 } else {
                     document.getElementById('popup-error-title').textContent = 'ACCESS DENIED';
                     document.getElementById('popup-error-desc').textContent = 'Incorrect username or password.';
                     document.getElementById('popup-error-title').style.color = '#ff3366';
+                    
+                    if (errorAudio) {
+                        errorAudio.currentTime = 0;
+                        errorAudio.play().catch(e => console.log('Audio blocked', e));
+                    }
                 }
                 
                 document.getElementById('error-popup-overlay').style.display = 'flex';
