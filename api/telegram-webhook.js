@@ -23,6 +23,46 @@ export default async function handler(req, res) {
         const text = body.message.text;
         const chatId = body.message.chat.id;
 
+        // /start or /help command
+        if (text === '/start' || text === '/help') {
+            const helpText = `
+🚀 *NEXTGEN ADMIN BOT* 🚀
+
+Available Commands:
+👤 \`/add_user user pass\` - Add new user
+👥 \`/list_users\` - View all users
+🗑️ \`/clear_users\` - Delete all users
+🔍 \`/check_db\` - Check database connection
+            `;
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: chatId, text: helpText, parse_mode: 'Markdown' })
+            });
+            return res.status(200).send('OK');
+        }
+
+        // /check_db command
+        if (text === '/check_db') {
+            try {
+                await redis.set('test_ping', 'pong');
+                const val = await redis.get('test_ping');
+                const status = val === 'pong' ? '✅ *DATABASE ONLINE*' : '❌ *DATABASE ERROR*';
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: status, parse_mode: 'Markdown' })
+                });
+            } catch (e) {
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: `❌ *CONNECTION FAILED*\nError: ${e.message}`, parse_mode: 'Markdown' })
+                });
+            }
+            return res.status(200).send('OK');
+        }
+
         // /add_user command
         if (text.startsWith('/add_user')) {
             const parts = text.split(' ');
