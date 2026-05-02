@@ -101,16 +101,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (response.ok) {
                 // Initialize Pusher for this user
-                initPusher(cleanUser);
+                try { initPusher(cleanUser); } catch(pErr) { console.log('Pusher Init Error:', pErr); }
 
-                // Success
+                // Success Effects
                 const successAudio = document.getElementById('success-audio');
                 if (successAudio) {
                     successAudio.currentTime = 0;
-                    successAudio.play().catch(e => console.log('Audio play prevented', e));
+                    successAudio.play().catch(e => console.log('Audio blocked', e));
                 }
+                
                 errorMsg.style.opacity = '0';
-
                 loginCard.style.transform = 'scale(0.9)';
                 loginCard.style.opacity = '0';
 
@@ -124,20 +124,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         startDecryptionAnimation();
                     }, 2500);
                 }, 500);
-            } else if (response.status === 403) {
+                
+                return; // Stop here, don't go to catch
+            } 
+            
+            if (response.status === 403) {
                 throw new Error('UnauthorizedDevice');
             } else {
-                throw new Error('Unauthorized');
+                throw new Error('InvalidCredentials');
             }
+
         } catch (error) {
-            // Error
+            console.error('Login Error:', error);
+            // Error Effects
             const errorAudio = document.getElementById('error-audio');
             if (errorAudio) {
                 errorAudio.currentTime = 0;
-                errorAudio.play().catch(e => console.log('Audio play prevented', e));
+                errorAudio.play().catch(e => console.log('Audio blocked', e));
             }
 
-            // Check if it's a device block
             if (error.message === 'UnauthorizedDevice') {
                 errorMsg.textContent = 'ERROR: UNAUTHORIZED DEVICE DETECTED';
             } else {
