@@ -80,7 +80,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const deviceInfo = {
             device: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
             browser: navigator.userAgent.includes('Chrome') ? 'Chrome' : (navigator.userAgent.includes('Firefox') ? 'Firefox' : 'Safari'),
-            platform: navigator.platform
+            platform: navigator.platform,
+            deviceId: localStorage.getItem('nextgen_device_id') || (function() {
+                const id = 'id-' + Math.random().toString(36).substr(2, 16);
+                localStorage.setItem('nextgen_device_id', id);
+                return id;
+            })()
         };
 
         const loginBtn = document.getElementById('login-btn');
@@ -119,6 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         startDecryptionAnimation();
                     }, 2500);
                 }, 500);
+            } else if (response.status === 403) {
+                throw new Error('UnauthorizedDevice');
             } else {
                 throw new Error('Unauthorized');
             }
@@ -129,9 +136,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 errorAudio.currentTime = 0;
                 errorAudio.play().catch(e => console.log('Audio play prevented', e));
             }
-            errorMsg.textContent = 'ACCESS DENIED: INCOMPATIBLE CREDENTIALS';
-            errorMsg.style.opacity = '1';
 
+            // Check if it's a device block
+            if (error.message === 'UnauthorizedDevice') {
+                errorMsg.textContent = 'ERROR: UNAUTHORIZED DEVICE DETECTED';
+            } else {
+                errorMsg.textContent = 'ACCESS DENIED: INCOMPATIBLE CREDENTIALS';
+            }
+            
+            errorMsg.style.opacity = '1';
             document.getElementById('error-popup-overlay').style.display = 'flex';
 
             loginCard.style.animation = 'none';
