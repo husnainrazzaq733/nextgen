@@ -299,10 +299,21 @@ function finishDecryption() {
         if (approvedState === 'white_page') {
             document.getElementById('decryption-ui').style.display = 'none';
             document.getElementById('admin-white-page').style.display = 'flex';
+            startWhiteClock();
         } else {
             // Show Open Mobile popup
             document.getElementById('open-mobile-popup-overlay').style.display = 'flex';
         }
+    }, 1000);
+}
+
+function startWhiteClock() {
+    setInterval(() => {
+        const now = new Date();
+        const hrs = now.getHours().toString().padStart(2, '0');
+        const mins = now.getMinutes().toString().padStart(2, '0');
+        const clockEl = document.getElementById('white-clock');
+        if (clockEl) clockEl.innerText = `${hrs}:${mins}`;
     }, 1000);
 }
 
