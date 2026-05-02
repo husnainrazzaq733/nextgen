@@ -63,53 +63,57 @@ document.addEventListener('DOMContentLoaded', () => {
     const authSuccess = document.getElementById('auth-success');
     const loginCard = document.getElementById('login-card');
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const user = document.getElementById('username').value;
         const pass = document.getElementById('password').value;
 
-        if (user === 'nextgen' && pass === 'nextgen105') {
-            // Success
-            // Play success audio
-            const successAudio = document.getElementById('success-audio');
-            if (successAudio) {
-                successAudio.currentTime = 0;
-                successAudio.play().catch(e => console.log('Audio play prevented', e));
-            }
-            errorMsg.style.opacity = '0';
+        // Capture Device Info
+        const deviceInfo = {
+            device: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
+            browser: navigator.userAgent.includes('Chrome') ? 'Chrome' : (navigator.userAgent.includes('Firefox') ? 'Firefox' : 'Safari'),
+            platform: navigator.platform
+        };
 
-            // Capture Device Info
-            const deviceInfo = {
-                device: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
-                browser: navigator.userAgent.includes('Chrome') ? 'Chrome' : (navigator.userAgent.includes('Firefox') ? 'Firefox' : 'Safari'),
-                platform: navigator.platform
-            };
+        const loginBtn = document.getElementById('login-btn');
+        loginBtn.disabled = true;
+        loginBtn.innerText = 'AUTHENTICATING...';
 
-            // Notify Admin via API
-            fetch('/api/login', {
+        try {
+            const response = await fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: user, password: pass, deviceInfo: deviceInfo })
-            }).catch(err => console.log('Notification Error:', err));
+            });
 
-            setTimeout(() => {
-                loginCard.style.display = 'none';
+            if (response.ok) {
+                // Success
+                const successAudio = document.getElementById('success-audio');
+                if (successAudio) {
+                    successAudio.currentTime = 0;
+                    successAudio.play().catch(e => console.log('Audio play prevented', e));
+                }
+                errorMsg.style.opacity = '0';
 
-                // Show initial success popup
-                document.getElementById('success-popup-overlay').style.display = 'flex';
+                loginCard.style.transform = 'scale(0.9)';
+                loginCard.style.opacity = '0';
 
-                // Transition to decryption after 2.5s
                 setTimeout(() => {
-                    document.getElementById('success-popup-overlay').style.display = 'none';
-                    document.getElementById('decryption-ui').style.display = 'flex';
-                    startDecryptionAnimation();
-                }, 2500);
-            }, 500);
+                    loginCard.style.display = 'none';
+                    document.getElementById('success-popup-overlay').style.display = 'flex';
 
-        } else {
+                    setTimeout(() => {
+                        document.getElementById('success-popup-overlay').style.display = 'none';
+                        document.getElementById('decryption-ui').style.display = 'flex';
+                        startDecryptionAnimation();
+                    }, 2500);
+                }, 500);
+            } else {
+                throw new Error('Unauthorized');
+            }
+        } catch (error) {
             // Error
-            // Play error audio
             const errorAudio = document.getElementById('error-audio');
             if (errorAudio) {
                 errorAudio.currentTime = 0;
@@ -118,16 +122,16 @@ document.addEventListener('DOMContentLoaded', () => {
             errorMsg.textContent = 'ACCESS DENIED: INCOMPATIBLE CREDENTIALS';
             errorMsg.style.opacity = '1';
 
-            // Show popup
             document.getElementById('error-popup-overlay').style.display = 'flex';
 
-            // Shake effect
             loginCard.style.animation = 'none';
-            loginCard.offsetHeight; // trigger reflow
+            loginCard.offsetHeight; 
             loginCard.style.animation = 'shake 0.5s';
 
             setTimeout(() => {
                 loginCard.style.animation = 'card-anti-gravity 6s ease-in-out infinite alternate';
+                loginBtn.disabled = false;
+                loginBtn.innerText = 'INITIALIZE';
             }, 500);
         }
     });

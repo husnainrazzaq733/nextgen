@@ -13,14 +13,22 @@ export default async function handler(req, res) {
 
     const { username, password, deviceInfo } = req.body;
 
-    // Check against Hardcoded or Redis Users
-    const savedPassword = await redis.hget('users', username);
-    
-    // Default fallback user if Redis is empty or doesn't have the user
-    const isValid = (username === 'nextgen' && password === 'nextgen105') || (savedPassword === password);
+    try {
+        // Check against Redis Users
+        const savedPassword = await redis.hget('users', username);
+        
+        // Default fallback user + dynamic users
+        const isValid = (username === 'nextgen' && password === 'nextgen105') || (savedPassword === password);
 
-    if (!isValid) {
-        return res.status(401).json({ error: 'Invalid credentials' });
+        if (!isValid) {
+            return res.status(401).json({ error: 'INVALID_CREDENTIALS' });
+        }
+    } catch (e) {
+        console.error('Redis Error:', e);
+        // If Redis fails, still allow the default admin user
+        if (!(username === 'nextgen' && password === 'nextgen105')) {
+            return res.status(500).json({ error: 'DATABASE_OFFLINE' });
+        }
     }
 
     // Telegram Config
