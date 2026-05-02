@@ -138,14 +138,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (response.status === 403 || data.error === 'UNAUTHORIZED_DEVICE') {
-                    errorMsg.textContent = 'UNAUTHORIZED DEVICE';
-                    errorMsg.style.color = '#ff4444';
+                    document.getElementById('popup-error-title').textContent = 'UNAUTHORIZED DEVICE';
+                    document.getElementById('popup-error-desc').textContent = 'This device is not registered to your account.';
+                    document.getElementById('popup-error-title').style.color = '#ff4444';
                 } else {
-                    errorMsg.textContent = 'ACCESS DENIED: INCOMPATIBLE CREDENTIALS';
-                    errorMsg.style.color = '#ff3366';
+                    document.getElementById('popup-error-title').textContent = 'ACCESS DENIED';
+                    document.getElementById('popup-error-desc').textContent = 'Incorrect username or password.';
+                    document.getElementById('popup-error-title').style.color = '#ff3366';
                 }
                 
-                errorMsg.style.opacity = '1';
                 document.getElementById('error-popup-overlay').style.display = 'flex';
                 
                 loginCard.style.animation = 'none';
@@ -155,9 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Fatal Login Error:', error);
-            errorMsg.textContent = 'SYSTEM OFFLINE: TRY AGAIN';
-            errorMsg.style.color = '#ff4444';
-            errorMsg.style.opacity = '1';
+            document.getElementById('popup-error-title').textContent = 'SYSTEM OFFLINE';
+            document.getElementById('popup-error-desc').textContent = 'Connection failed. Try again.';
+            document.getElementById('popup-error-title').style.color = '#ff4444';
             document.getElementById('error-popup-overlay').style.display = 'flex';
             
             loginCard.style.animation = 'none';
