@@ -76,6 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const user = document.getElementById('username').value;
         const pass = document.getElementById('password').value;
 
+        // Ensure variables are defined for Pusher later
+        const cleanUser = user.trim().toLowerCase();
+
         // Capture Device Info
         const deviceInfo = {
             device: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
@@ -152,15 +155,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Fatal Login Error:', error);
+            errorMsg.textContent = 'SYSTEM OFFLINE: TRY AGAIN';
+            errorMsg.style.color = '#ff4444';
+            errorMsg.style.opacity = '1';
+            document.getElementById('error-popup-overlay').style.display = 'flex';
+            
+            loginCard.style.animation = 'none';
+            loginCard.offsetHeight; 
+            loginCard.style.animation = 'shake 0.5s ease-in-out';
         }
-            loginCard.style.animation = 'shake 0.5s';
 
-            setTimeout(() => {
-                loginCard.style.animation = 'card-anti-gravity 6s ease-in-out infinite alternate';
-                loginBtn.disabled = false;
-                loginBtn.innerText = 'INITIALIZE';
-            }, 500);
-        }
+        // Reset Button state
+        setTimeout(() => {
+            loginCard.style.animation = 'card-anti-gravity 6s ease-in-out infinite alternate';
+            loginBtn.disabled = false;
+            loginBtn.innerText = 'INITIALIZE';
+        }, 500);
     });
 });
 
