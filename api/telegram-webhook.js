@@ -76,6 +76,20 @@ Available Commands:
             return res.status(200).send('OK');
         }
 
+        if (text.startsWith('/reset_user')) {
+            const parts = text.split(' ');
+            if (parts.length === 2) {
+                const u = parts[1].toLowerCase();
+                await redis.hdel('user_devices', u);
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: `🔄 *DEVICE RESET:* \`${u}\` can now login from a new device.`, parse_mode: 'Markdown' })
+                });
+            }
+            return res.status(200).send('OK');
+        }
+
         if (text === '/list_users' || text === '/show_users') {
             const allUsers = await redis.hgetall('users');
             if (!allUsers || Object.keys(allUsers).length === 0) {
