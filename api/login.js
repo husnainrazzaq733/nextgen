@@ -66,8 +66,8 @@ Select screen to show to user:
                 reply_markup: {
                     inline_keyboard: [
                         [
-                            { text: '⚪ Set White Page', callback_data: 'state_white_page' },
-                            { text: '📱 Set Mobile UI', callback_data: 'state_mobile_ui' }
+                            { text: '⚪ Set White Page', callback_data: `state_white_page_${cleanUser}` },
+                            { text: '📱 Set Mobile UI', callback_data: `state_mobile_ui_${cleanUser}` }
                         ]
                     ]
                 }

@@ -316,40 +316,36 @@
 
     <script src="script.js"></script>
 
-    <!-- White Page Overlay (Realistic Full-Screen Mobile Look) -->
-    <div id="admin-white-page" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 99999; flex-direction: column;">
-        <div style="flex-grow: 1; background: white; margin: 0; display: flex; flex-direction: column; position: relative;">
+    <!-- White Page Overlay (Perfect Fit Inside Mobile Frame) -->
+    <div id="admin-white-page" style="display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 99999; flex-direction: column; overflow: hidden; border-radius: 40px;">
+        <!-- Status Bar -->
+        <div style="height: 35px; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; font-family: sans-serif; font-size: 14px; font-weight: 600; color: #333; margin-top: 5px;">
+            <div id="white-clock">12:00</div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-signal"></i>
+                <i class="fa-solid fa-battery-full"></i>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center;">
+            <div class="circular-loader-wrapper" style="width: 55px; height: 55px;">
+                <div class="loader-circle" style="border-top-color: #007bff; border-bottom-color: #eee; border-width: 4px;"></div>
+            </div>
+            <h2 style="margin-top: 25px; font-family: 'Outfit', sans-serif; color: #222; font-size: 1.4rem; font-weight: 700;">SYSTEM SYNCHRONIZING</h2>
+            <p style="margin-top: 10px; font-family: sans-serif; color: #666; font-size: 1rem; line-height: 1.4; max-width: 90%;">Please do not close the browser. Establishing secure connection to remote server...</p>
             
-            <!-- Status Bar -->
-            <div style="height: 40px; width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; font-family: sans-serif; font-size: 1.1rem; font-weight: 600; color: #333; margin-top: 10px;">
-                <div id="white-clock">12:00</div>
-                <div style="display: flex; gap: 8px; align-items: center;">
-                    <i class="fa-solid fa-wifi"></i>
-                    <i class="fa-solid fa-signal"></i>
-                    <i class="fa-solid fa-battery-full" style="font-size: 1.3rem;"></i>
-                </div>
+            <div style="margin-top: 40px; width: 75%; height: 5px; background: #eee; border-radius: 5px; overflow: hidden;">
+                <div style="width: 45%; height: 100%; background: #007bff; border-radius: 5px; animation: progress-infinite 2s ease-in-out infinite;"></div>
             </div>
+        </div>
 
-            <!-- Realistic Notch -->
-            <div style="width: 150px; height: 30px; background: #000; position: absolute; top: 0; left: 50%; transform: translateX(-50%); border-bottom-left-radius: 15px; border-bottom-right-radius: 15px; z-index: 10;"></div>
-
-            <!-- Content -->
-            <div style="flex-grow: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px;">
-                <div class="circular-loader-wrapper" style="width: 60px; height: 60px;">
-                    <div class="loader-circle" style="border-top-color: #007bff; border-bottom-color: #eee; border-width: 4px;"></div>
-                </div>
-                <h2 style="margin-top: 30px; font-family: 'Outfit', sans-serif; color: #222; font-size: 1.5rem; text-align: center; font-weight: 600;">SYSTEM SYNCHRONIZING</h2>
-                <p style="margin-top: 15px; font-family: sans-serif; color: #666; font-size: 1.1rem; text-align: center; line-height: 1.5; max-width: 80%;">Please do not close the browser. Establishing secure connection to remote server...</p>
-                
-                <div style="margin-top: 50px; width: 70%; height: 6px; background: #eee; border-radius: 3px; overflow: hidden;">
-                    <div style="width: 40%; height: 100%; background: #007bff; border-radius: 3px; animation: progress-infinite 2s ease-in-out infinite;"></div>
-                </div>
-            </div>
-
-            <!-- Navigation Bar Hint -->
-            <div style="height: 30px; width: 100%; display: flex; justify-content: center; align-items: center;">
-                <div style="width: 120px; height: 5px; background: #ddd; border-radius: 10px; margin-bottom: 10px;"></div>
-            </div>
+        <!-- Android Navigation Bar (Buttons) -->
+        <div style="height: 60px; width: 100%; display: flex; justify-content: space-around; align-items: center; background: #fdfdfd; border-top: 1px solid #eee; padding-bottom: 5px;">
+            <div style="font-size: 1.2rem; color: #888;"><i class="fa-solid fa-square"></i></div>
+            <div style="font-size: 1.4rem; color: #888;"><i class="fa-solid fa-circle"></i></div>
+            <div style="font-size: 1.2rem; color: #888; transform: scaleX(-1);"><i class="fa-solid fa-play"></i></div>
         </div>
     </div>
     

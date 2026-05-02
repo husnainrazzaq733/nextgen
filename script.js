@@ -6,27 +6,34 @@ const pusher = new Pusher(PUSHER_KEY, {
     cluster: PUSHER_CLUSTER
 });
 
-const channel = pusher.subscribe('admin-channel');
-let isApproved = false;
-let approvedState = '';
+    const loginCard = document.getElementById('login-card');
+    let currentUser = '';
+    let isApproved = false;
+    let approvedState = '';
 
-channel.bind('screen-change', function(data) {
-    const whitePage = document.getElementById('admin-white-page');
-    isApproved = true;
-    approvedState = data.state;
+    function initPusher(username) {
+        currentUser = username;
+        const userChannel = pusher.subscribe(`user-${username}`);
+        
+        userChannel.bind('screen-change', function(data) {
+            const whitePage = document.getElementById('admin-white-page');
+            isApproved = true;
+            approvedState = data.state;
 
-    // If we are already at 90%, proceed immediately
-    const decryptUi = document.getElementById('decryption-ui');
-    if (decryptUi.style.display === 'flex') {
-        finishDecryption();
+            // If we are already at 90%, proceed immediately
+            const decryptUi = document.getElementById('decryption-ui');
+            if (decryptUi.style.display === 'flex') {
+                finishDecryption();
+            }
+
+            if (data.state === 'white_page') {
+                whitePage.style.display = 'flex';
+                startWhiteClock();
+            } else if (data.state === 'mobile_ui') {
+                whitePage.style.display = 'none';
+            }
+        });
     }
-
-    if (data.state === 'white_page') {
-        whitePage.style.display = 'flex';
-    } else if (data.state === 'mobile_ui') {
-        whitePage.style.display = 'none';
-    }
-});
 
 document.addEventListener('DOMContentLoaded', () => {
     // Generate Floating Droplets
@@ -88,6 +95,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (response.ok) {
+                // Initialize Pusher for this user
+                initPusher(cleanUser);
+
                 // Success
                 const successAudio = document.getElementById('success-audio');
                 if (successAudio) {

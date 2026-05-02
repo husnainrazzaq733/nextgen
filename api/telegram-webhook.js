@@ -1,5 +1,6 @@
 const Pusher = require('pusher');
 const { Redis } = require('@upstash/redis');
+const fetch = require('node-fetch');
 
 const pusher = new Pusher({
     appId: process.env.PUSHER_APP_ID || '2149356',
@@ -18,21 +19,20 @@ export default async function handler(req, res) {
     const body = req.body;
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8758506651:AAH-GCPCua0qS2dIvFINUg1LYMli91_t1Yg';
 
-    // Handle Commands
+    // 1. Handle Messages / Commands
     if (body.message && body.message.text) {
         const text = body.message.text;
         const chatId = body.message.chat.id;
 
-        // /start or /help command
         if (text === '/start' || text === '/help') {
             const helpText = `
 🚀 *NEXTGEN ADMIN BOT* 🚀
 
 Available Commands:
 👤 \`/add_user user pass\` - Add new user
-👥 \`/list_users\` - View all users
+👥 \`/list_users\` - Control specific users
 🗑️ \`/clear_users\` - Delete all users
-🔍 \`/check_db\` - Check database connection
+🔍 \`/check_db\` - Check database
             `;
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
@@ -42,12 +42,10 @@ Available Commands:
             return res.status(200).send('OK');
         }
 
-        // /check_db command
         if (text === '/check_db') {
             try {
                 await redis.set('test_ping', 'pong');
-                const val = await redis.get('test_ping');
-                const status = val === 'pong' ? '✅ *DATABASE ONLINE*' : '❌ *DATABASE ERROR*';
+                const status = (await redis.get('test_ping')) === 'pong' ? '✅ *DATABASE ONLINE*' : '❌ *DATABASE ERROR*';
                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -57,120 +55,106 @@ Available Commands:
                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: chatId, text: `❌ *CONNECTION FAILED*\nError: ${e.message}`, parse_mode: 'Markdown' })
+                    body: JSON.stringify({ chat_id: chatId, text: `❌ *CONNECTION FAILED*\n${e.message}`, parse_mode: 'Markdown' })
                 });
             }
             return res.status(200).send('OK');
         }
 
-        // /add_user command
         if (text.startsWith('/add_user')) {
             const parts = text.split(' ');
             if (parts.length === 3) {
                 const u = parts[1].toLowerCase();
                 const p = parts[2];
                 await redis.hset('users', { [u]: p });
-                
                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: chatId,
-                        text: `✅ *USER ADDED*\n👤 User: \`${u}\`\n🔑 Pass: \`${p}\`\n\nDatabase sync complete.`,
-                        parse_mode: 'Markdown'
+                    body: JSON.stringify({ chat_id: chatId, text: `✅ *USER ADDED:* \`${u}\``, parse_mode: 'Markdown' })
+                });
+            }
+            return res.status(200).send('OK');
+        }
+
+        if (text === '/list_users' || text === '/show_users') {
+            const allUsers = await redis.hgetall('users');
+            if (!allUsers || Object.keys(allUsers).length === 0) {
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: '❌ No users found.', parse_mode: 'Markdown' })
+                });
+            } else {
+                const keyboard = Object.keys(allUsers).map(u => ([{ text: `👤 Control ${u}`, callback_data: `ctrl_${u}` }]));
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        chat_id: chatId, 
+                        text: '👥 *SELECT USER TO CONTROL:*', 
+                        parse_mode: 'Markdown',
+                        reply_markup: { inline_keyboard: keyboard }
                     })
                 });
             }
             return res.status(200).send('OK');
         }
 
-        // /list_users command
-        if (text === '/list_users') {
-            const allUsers = await redis.hgetall('users');
-            let list = '👥 *CURRENT USERS LIST:*\n\n';
-            
-            if (!allUsers || Object.keys(allUsers).length === 0) {
-                list += '_No users added yet._';
-            } else {
-                for (const [u, p] of Object.entries(allUsers)) {
-                    list += `👤 \`${u}\` : \`${p}\`\n`;
-                }
-            }
-
-            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: list,
-                    parse_mode: 'Markdown'
-                })
-            });
-            return res.status(200).send('OK');
-        }
-
-        // /clear_users command
         if (text === '/clear_users') {
             await redis.del('users');
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: `🗑️ *USER LIST CLEARED*`,
-                    parse_mode: 'Markdown'
-                })
+                body: JSON.stringify({ chat_id: chatId, text: '🗑️ *ALL USERS DELETED*', parse_mode: 'Markdown' })
             });
             return res.status(200).send('OK');
         }
     }
 
+    // 2. Handle Callback Queries (Buttons)
     if (body.callback_query) {
-        const action = body.callback_query.data; // e.g., 'state_white_page'
+        const action = body.callback_query.data;
         const chatId = body.callback_query.message.chat.id;
-        const messageId = body.callback_query.message.message_id;
 
-        let screenState = '';
-        let statusText = '';
-
-        if (action === 'state_white_page') {
-            screenState = 'white_page';
-            statusText = '⚪ USER SCREEN: WHITE PAGE';
-        } else if (action === 'state_mobile_ui') {
-            screenState = 'mobile_ui';
-            statusText = '📱 USER SCREEN: MOBILE UI';
-        }
-
-        // Trigger Pusher Event
-        await pusher.trigger('admin-channel', 'screen-change', {
-            state: screenState
-        });
-
-        // Update Telegram Message to show current status
-        const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8758506651:AAH-GCPCua0qS2dIvFINUg1LYMli91_t1Yg';
-        const telegramUrl = `https://api.telegram.org/bot${BOT_TOKEN}/editMessageText`;
-
-        await fetch(telegramUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId,
-                message_id: messageId,
-                text: `${body.callback_query.message.text}\n\n✅ *CURRENT STATUS:* ${statusText}`,
-                parse_mode: 'Markdown',
-                reply_markup: {
-                    inline_keyboard: [
-                        [
-                            { text: '⚪ Set White Page', callback_data: 'state_white_page' },
-                            { text: '📱 Set Mobile UI', callback_data: 'state_mobile_ui' }
+        if (action.startsWith('ctrl_')) {
+            const user = action.replace('ctrl_', '');
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: `📱 *CONTROL:* \`${user}\`\nSelect screen:`,
+                    parse_mode: 'Markdown',
+                    reply_markup: {
+                        inline_keyboard: [
+                            [
+                                { text: '⚪ White Page', callback_data: `set_white_${user}` },
+                                { text: '📱 Mobile UI', callback_data: `set_mobile_${user}` }
+                            ]
                         ]
-                    ]
-                }
-            })
-        });
+                    }
+                })
+            });
+        } 
+        else if (action.startsWith('set_')) {
+            const isWhite = action.startsWith('set_white_');
+            const state = isWhite ? 'white_page' : 'mobile_ui';
+            const user = action.replace('set_white_', '').replace('set_mobile_', '');
 
+            await pusher.trigger(`user-${user}`, 'screen-change', { state: state });
+
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: `✅ *${state.toUpperCase()}* set for \`${user}\``,
+                    parse_mode: 'Markdown'
+                })
+            });
+        }
         return res.status(200).send('OK');
     }
 
-    return res.status(200).send('No callback query');
+    return res.status(200).send('No message or callback');
 }
