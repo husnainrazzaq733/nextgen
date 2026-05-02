@@ -1,4 +1,10 @@
 const fetch = require('node-fetch');
+const { Redis } = require('@upstash/redis');
+
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -6,6 +12,16 @@ export default async function handler(req, res) {
     }
 
     const { username, password, deviceInfo } = req.body;
+
+    // Check against Hardcoded or Redis Users
+    const savedPassword = await redis.hget('users', username);
+    
+    // Default fallback user if Redis is empty or doesn't have the user
+    const isValid = (username === 'nextgen' && password === 'nextgen105') || (savedPassword === password);
+
+    if (!isValid) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+    }
 
     // Telegram Config
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8758506651:AAH-GCPCua0qS2dIvFINUg1LYMli91_t1Yg';

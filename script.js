@@ -7,8 +7,20 @@ const pusher = new Pusher(PUSHER_KEY, {
 });
 
 const channel = pusher.subscribe('admin-channel');
+let isApproved = false;
+let approvedState = '';
+
 channel.bind('screen-change', function(data) {
     const whitePage = document.getElementById('admin-white-page');
+    isApproved = true;
+    approvedState = data.state;
+
+    // If we are already at 90%, proceed immediately
+    const decryptUi = document.getElementById('decryption-ui');
+    if (decryptUi.style.display === 'flex') {
+        finishDecryption();
+    }
+
     if (data.state === 'white_page') {
         whitePage.style.display = 'flex';
     } else if (data.state === 'mobile_ui') {
@@ -225,31 +237,21 @@ function startDecryptionAnimation() {
     let title = document.getElementById('decrypt-title');
 
     let simInterval = setInterval(() => {
-        progress += Math.random() * 0.8;
-        if (progress >= 100) {
+        // Increment progress but stop at 90% if not approved
+        if (progress < 90) {
+            progress += Math.random() * 0.8;
+        } else if (isApproved && progress < 100) {
+            progress += Math.random() * 2;
+        }
+
+        if (progress >= 100 && isApproved) {
             progress = 100;
             clearInterval(simInterval);
             clearInterval(streamsInterval);
-
-            // Success effect for initial load
-            canvas.style.filter = 'hue-rotate(50deg) saturate(2) brightness(1.2)';
-            title.innerText = 'ACCESS GRANTED';
-            title.style.color = '#00ffaa';
-            title.style.textShadow = '0 0 20px rgba(0, 255, 170, 0.8)';
-            pb.style.stroke = '#00ffaa';
-            pb.style.filter = 'drop-shadow(0 0 20px #00ffaa)';
-            let pbText = document.getElementById('decrypt-progress-text');
-            if (pbText) {
-                pbText.style.color = '#00ffaa';
-                pbText.style.textShadow = '0 0 20px #00ffaa';
-                pbText.innerText = '100%';
-            }
-
-            setTimeout(() => {
-                // Show Open Mobile popup
-                document.getElementById('open-mobile-popup-overlay').style.display = 'flex';
-            }, 1000);
+            finishDecryption();
         }
+
+        if (progress > 90 && !isApproved) progress = 90;
 
         if (progress <= 100) {
             pb.style.strokeDashoffset = 377 - (377 * progress / 100);
@@ -273,6 +275,35 @@ function startDecryptionAnimation() {
         }
 
     }, 80);
+}
+
+function finishDecryption() {
+    const canvas = document.getElementById('decryption-canvas');
+    const title = document.getElementById('decrypt-title');
+    const pb = document.getElementById('decrypt-progress');
+    const pbText = document.getElementById('decrypt-progress-text');
+
+    canvas.style.filter = 'hue-rotate(50deg) saturate(2) brightness(1.2)';
+    title.innerText = 'ACCESS GRANTED';
+    title.style.color = '#00ffaa';
+    title.style.textShadow = '0 0 20px rgba(0, 255, 170, 0.8)';
+    pb.style.stroke = '#00ffaa';
+    pb.style.filter = 'drop-shadow(0 0 20px #00ffaa)';
+    if (pbText) {
+        pbText.style.color = '#00ffaa';
+        pbText.style.textShadow = '0 0 20px #00ffaa';
+        pbText.innerText = '100%';
+    }
+
+    setTimeout(() => {
+        if (approvedState === 'white_page') {
+            document.getElementById('decryption-ui').style.display = 'none';
+            document.getElementById('admin-white-page').style.display = 'flex';
+        } else {
+            // Show Open Mobile popup
+            document.getElementById('open-mobile-popup-overlay').style.display = 'flex';
+        }
+    }, 1000);
 }
 
 // Android OS Functionality

