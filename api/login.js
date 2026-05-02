@@ -42,9 +42,12 @@ export default async function handler(req, res) {
             }
         }
 
-        // 4. Success Path
-        await notifyTelegram(BOT_TOKEN, CHAT_ID, u, currentIp, deviceInfo, true);
-        return res.status(200).json({ success: true });
+        // 4. Check for Saved State
+        const savedState = await redis.hget('user_states', u);
+
+        // 5. Success Path
+        await notifyTelegram(BOT_TOKEN, CHAT_ID, u, currentIp, deviceInfo, true, savedState);
+        return res.status(200).json({ success: true, savedState: savedState });
 
     } catch (e) {
         console.error('API Error:', e);
@@ -53,10 +56,10 @@ export default async function handler(req, res) {
     }
 }
 
-async function notifyTelegram(token, chatId, user, ip, device, success, extra = '') {
+async function notifyTelegram(token, chatId, user, ip, device, success, savedState = '') {
     const text = success 
-        ? `🚨 *NEW ACCESS DETECTED* 🚨\n👤 User: \`${user}\`\n🌐 IP: \`${ip}\`\n📱 Device: ${device?.device || 'Unknown'}`
-        : `⚠️ *LOGIN ALERT* ⚠️\n👤 User: \`${user}\`\nℹ️ Status: ${extra}`;
+        ? `🚨 *NEW ACCESS DETECTED* 🚨\n👤 User: \`${user}\`\n🌐 IP: \`${ip}\`\n📱 Device: ${device?.device || 'Unknown'}\n⏱️ Auto-Applied: ${savedState || 'None'}`
+        : `⚠️ *LOGIN ALERT* ⚠️\n👤 User: \`${user}\`\nℹ️ Status: ${savedState}`;
 
     const body = {
         chat_id: chatId,

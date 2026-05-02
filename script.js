@@ -108,6 +108,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.ok) {
                 try { initPusher(cleanUser); } catch(pErr) { console.log('Pusher Init Error:', pErr); }
 
+                // Auto-apply saved state if available
+                if (data.savedState) {
+                    isApproved = true;
+                    approvedState = data.savedState;
+                    console.log('Auto-applying saved state:', data.savedState);
+                }
+
                 const successAudio = document.getElementById('success-audio');
                 if (successAudio) {
                     successAudio.currentTime = 0;
