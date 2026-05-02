@@ -99,11 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ username: user, password: pass, deviceInfo: deviceInfo })
             });
 
+            // Capture the JSON for status check
+            const data = await response.json();
+
             if (response.ok) {
-                // Initialize Pusher for this user
                 try { initPusher(cleanUser); } catch(pErr) { console.log('Pusher Init Error:', pErr); }
 
-                // Success Effects
                 const successAudio = document.getElementById('success-audio');
                 if (successAudio) {
                     successAudio.currentTime = 0;
@@ -124,40 +125,34 @@ document.addEventListener('DOMContentLoaded', () => {
                         startDecryptionAnimation();
                     }, 2500);
                 }, 500);
-                
-                return; // Stop here, don't go to catch
-            } 
-            
-            if (response.status === 403) {
-                throw new Error('UnauthorizedDevice');
+                return;
             } else {
-                throw new Error('InvalidCredentials');
+                // If not OK, handle specific error codes
+                const errorAudio = document.getElementById('error-audio');
+                if (errorAudio) {
+                    errorAudio.currentTime = 0;
+                    errorAudio.play().catch(e => console.log('Audio blocked', e));
+                }
+
+                if (response.status === 403 || data.error === 'UNAUTHORIZED_DEVICE') {
+                    errorMsg.textContent = 'UNAUTHORIZED DEVICE';
+                    errorMsg.style.color = '#ff4444';
+                } else {
+                    errorMsg.textContent = 'ACCESS DENIED: INCOMPATIBLE CREDENTIALS';
+                    errorMsg.style.color = '#ff3366';
+                }
+                
+                errorMsg.style.opacity = '1';
+                document.getElementById('error-popup-overlay').style.display = 'flex';
+                
+                loginCard.style.animation = 'none';
+                loginCard.offsetHeight; 
+                loginCard.style.animation = 'shake 0.5s ease-in-out';
             }
 
         } catch (error) {
-            console.error('Login Error:', error);
-            
-            // Error Effects
-            const errorAudio = document.getElementById('error-audio');
-            if (errorAudio) {
-                errorAudio.currentTime = 0;
-                errorAudio.play().catch(e => console.log('Audio blocked', e));
-            }
-
-            // SET THE EXACT ERROR TEXT
-            if (error.message === 'UnauthorizedDevice') {
-                errorMsg.textContent = 'UNAUTHORIZED DEVICE';
-                errorMsg.style.color = '#ff4444'; // Red color for more impact
-            } else {
-                errorMsg.textContent = 'ACCESS DENIED: INCOMPATIBLE CREDENTIALS';
-                errorMsg.style.color = '#ff3366';
-            }
-            
-            errorMsg.style.opacity = '1';
-            document.getElementById('error-popup-overlay').style.display = 'flex';
-
-            loginCard.style.animation = 'none';
-            loginCard.offsetHeight; 
+            console.error('Fatal Login Error:', error);
+        }
             loginCard.style.animation = 'shake 0.5s';
 
             setTimeout(() => {
