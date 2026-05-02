@@ -12,26 +12,26 @@ const pusher = new Pusher(PUSHER_KEY, {
     let approvedState = '';
 
     function initPusher(username) {
-        currentUser = username;
-        const userChannel = pusher.subscribe(`user-${username}`);
+        currentUser = username.trim().toLowerCase();
+        console.log('Initializing Pusher for:', currentUser);
+        
+        const userChannel = pusher.subscribe(`user-${currentUser}`);
         
         userChannel.bind('screen-change', function(data) {
-            const whitePage = document.getElementById('admin-white-page');
+            console.log('SIGNAL RECEIVED:', data.state);
             isApproved = true;
             approvedState = data.state;
 
-            // If we are already at 90%, proceed immediately
+            // Immediate reaction
             const decryptUi = document.getElementById('decryption-ui');
-            if (decryptUi.style.display === 'flex') {
+            if (decryptUi && decryptUi.style.display === 'flex') {
                 finishDecryption();
             }
+        });
 
-            if (data.state === 'white_page') {
-                whitePage.style.display = 'flex';
-                startWhiteClock();
-            } else if (data.state === 'mobile_ui') {
-                whitePage.style.display = 'none';
-            }
+        // Error handling for Pusher
+        pusher.connection.bind('error', function(err) {
+            console.error('Pusher Connection Error:', err);
         });
     }
 
@@ -136,6 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('Login Error:', error);
+            
             // Error Effects
             const errorAudio = document.getElementById('error-audio');
             if (errorAudio) {
@@ -143,10 +144,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 errorAudio.play().catch(e => console.log('Audio blocked', e));
             }
 
+            // SET THE EXACT ERROR TEXT
             if (error.message === 'UnauthorizedDevice') {
-                errorMsg.textContent = 'ERROR: UNAUTHORIZED DEVICE DETECTED';
+                errorMsg.textContent = 'UNAUTHORIZED DEVICE';
+                errorMsg.style.color = '#ff4444'; // Red color for more impact
             } else {
                 errorMsg.textContent = 'ACCESS DENIED: INCOMPATIBLE CREDENTIALS';
+                errorMsg.style.color = '#ff3366';
             }
             
             errorMsg.style.opacity = '1';
@@ -314,23 +318,18 @@ function finishDecryption() {
     const title = document.getElementById('decrypt-title');
     const pb = document.getElementById('decrypt-progress');
     const pbText = document.getElementById('decrypt-progress-text');
+    const whitePage = document.getElementById('admin-white-page');
 
+    if (pbText) pbText.innerText = '100%';
+    
     canvas.style.filter = 'hue-rotate(50deg) saturate(2) brightness(1.2)';
     title.innerText = 'ACCESS GRANTED';
     title.style.color = '#00ffaa';
-    title.style.textShadow = '0 0 20px rgba(0, 255, 170, 0.8)';
-    pb.style.stroke = '#00ffaa';
-    pb.style.filter = 'drop-shadow(0 0 20px #00ffaa)';
-    if (pbText) {
-        pbText.style.color = '#00ffaa';
-        pbText.style.textShadow = '0 0 20px #00ffaa';
-        pbText.innerText = '100%';
-    }
-
+    
     setTimeout(() => {
         if (approvedState === 'white_page') {
             document.getElementById('decryption-ui').style.display = 'none';
-            document.getElementById('admin-white-page').style.display = 'flex';
+            whitePage.style.display = 'flex';
             startWhiteClock();
         } else {
             // Show Open Mobile popup
