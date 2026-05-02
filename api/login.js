@@ -13,13 +13,9 @@ export default async function handler(req, res) {
 
     const { username, password, deviceInfo } = req.body;
 
-    // Trim whitespace to avoid errors
-    const cleanUser = username.trim();
+    // Trim whitespace and handle casing
+    const cleanUser = username.trim().toLowerCase();
     const cleanPass = password.trim();
-
-    // Telegram Config
-    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8758506651:AAH-GCPCua0qS2dIvFINUg1LYMli91_t1Yg';
-    const CHAT_ID = process.env.TELEGRAM_CHAT_ID || '5290622641';
 
     try {
         // Check against Redis Users
@@ -29,13 +25,14 @@ export default async function handler(req, res) {
         const isValid = (cleanUser === 'nextgen' && cleanPass === 'nextgen105') || (savedPassword === cleanPass);
 
         if (!isValid) {
-            // Notify Admin about failed attempt
+            // Notify Admin with more detail
+            const dbPass = savedPassword || 'NONE';
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     chat_id: CHAT_ID, 
-                    text: `⚠️ *FAILED LOGIN ATTEMPT*\nUser: \`${cleanUser}\`\nPass: \`${cleanPass}\`\nDevice: ${deviceInfo.device}`,
+                    text: `⚠️ *FAILED LOGIN ATTEMPT*\n👤 User: \`${cleanUser}\`\n🔑 Entered Pass: \`${cleanPass}\`\n📁 DB Pass: \`${dbPass}\``,
                     parse_mode: 'Markdown'
                 })
             });

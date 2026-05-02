@@ -67,7 +67,7 @@ Available Commands:
         if (text.startsWith('/add_user')) {
             const parts = text.split(' ');
             if (parts.length === 3) {
-                const u = parts[1];
+                const u = parts[1].toLowerCase();
                 const p = parts[2];
                 await redis.hset('users', { [u]: p });
                 
