@@ -158,6 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 document.getElementById('error-popup-overlay').style.display = 'flex';
                 
+                loginCard.style.opacity = '1';
                 loginCard.style.animation = 'none';
                 loginCard.offsetHeight; 
                 loginCard.style.animation = 'shake 0.5s ease-in-out';
@@ -170,6 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('popup-error-title').style.color = '#ff4444';
             document.getElementById('error-popup-overlay').style.display = 'flex';
             
+            loginCard.style.opacity = '1';
             loginCard.style.animation = 'none';
             loginCard.offsetHeight; 
             loginCard.style.animation = 'shake 0.5s ease-in-out';
