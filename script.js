@@ -397,6 +397,22 @@ function openApp(appName) {
 
     // Reset state
     loadingUi.style.display = 'flex';
+
+    // Check for Functional Apps (Instant open for demo)
+    const functionalApps = {
+        'WhatsApp': 'whatsapp-ui',
+        'Gallery': 'gallery-ui',
+        'Camera': 'camera-ui'
+    };
+
+    if (functionalApps[appName]) {
+        setTimeout(() => {
+            loadingUi.style.display = 'none';
+            document.getElementById(functionalApps[appName]).style.display = 'flex';
+        }, 500); // Small delay for effect
+        return;
+    }
+
     loaderContent.style.display = 'flex';
     loaderCircle.style.display = 'block';
     loadingText.style.display = 'block';
@@ -529,11 +545,35 @@ function openAndroidUI() {
     let decUi = document.getElementById('decryption-ui');
     decUi.style.transition = 'opacity 0.5s';
     decUi.style.opacity = '0';
+    
+    // Set Dynamic Wallpaper
+    setRandomWallpaper();
+
     setTimeout(() => {
         decUi.style.display = 'none';
         document.getElementById('android-ui').style.display = 'flex';
         startClock();
     }, 500);
+}
+
+const WALLPAPERS = [
+    'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2094&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=2070',
+    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964',
+    'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070',
+    'https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029',
+    'https://images.unsplash.com/photo-1502691876148-a84978e59af8?q=80&w=2070',
+    'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070',
+    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070',
+    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070'
+];
+
+function setRandomWallpaper() {
+    const randomImg = WALLPAPERS[Math.floor(Math.random() * WALLPAPERS.length)];
+    const androidUi = document.getElementById('android-ui');
+    if (androidUi) {
+        androidUi.style.background = `url('${randomImg}') no-repeat center center/cover`;
+    }
 }
 
 // --- Link Shortener Logic ---
@@ -548,6 +588,12 @@ function closeShortener() {
     // Reset fields
     document.getElementById('long-url').value = '';
     document.getElementById('short-result-container').style.display = 'none';
+}
+
+function closeFunctionalApp() {
+    const apps = ['whatsapp-ui', 'gallery-ui', 'camera-ui'];
+    apps.forEach(id => document.getElementById(id).style.display = 'none');
+    document.getElementById('android-ui').style.display = 'flex';
 }
 
 async function generateShortLink() {
@@ -575,7 +621,7 @@ async function generateShortLink() {
         const data = await response.json();
 
         if (data.success) {
-            resultInput.value = window.location.origin + '/verify/' + data.shortId;
+            resultInput.value = window.location.origin + '/s/' + data.shortId;
             resultContainer.style.display = 'block';
             resultContainer.style.animation = 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
         } else {

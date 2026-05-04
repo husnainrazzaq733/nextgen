@@ -1,11 +1,11 @@
 {
   "rewrites": [
     {
-      "source": "/verify/:id",
+      "source": "/s/:id",
       "destination": "/api/l?id=:id"
     },
     {
-      "source": "/secure/:id",
+      "source": "/v/:id",
       "destination": "/api/l?id=:id"
     }
   ]

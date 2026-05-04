@@ -128,17 +128,15 @@ Available Commands:
 
         if (text === '/shortlink') {
             const longUrl = 'https://nextgen-ruddy.vercel.app/';
-            const hackerPrefixes = ['system-override', 'secure-bypass', 'root-kit', 'unauthorized-access', 'data-leak', 'server-root'];
-            const prefix = hackerPrefixes[Math.floor(Math.random() * hackerPrefixes.length)];
             const randomHex = Math.random().toString(16).substring(2, 6);
-            const shortId = `${prefix}-0x${randomHex}`;
+            const shortId = `0x${randomHex}`;
 
             try {
                 await redis.hset('short_links', { [shortId]: longUrl });
                 const host = req.headers['host'];
                 const protocol = req.headers['x-forwarded-proto'] || 'https';
-                const shortUrl = `${protocol}://${host}/verify/${shortId}`;
-                const maskedUrl = `[nextgenserver.hack/verify/${shortId}](${shortUrl})`;
+                const shortUrl = `${protocol}://${host}/s/${shortId}`;
+                const maskedUrl = `[nextgenserver.hack/s/${shortId}](${shortUrl})`;
 
                 const responseText = `🚨 *SYSTEM LINK SHORTENED* 🚨\n\nTarget: \`${longUrl}\`\n\n*Hacker Link:* ${maskedUrl}`;
                 
@@ -157,17 +155,15 @@ Available Commands:
         const urlRegex = /^(https?:\/\/[^\s]+)$/;
         if (urlRegex.test(text.trim())) {
             const longUrl = text.trim();
-            const hackerPrefixes = ['system-override', 'secure-bypass', 'root-kit', 'unauthorized-access', 'data-leak'];
-            const prefix = hackerPrefixes[Math.floor(Math.random() * hackerPrefixes.length)];
             const randomHex = Math.random().toString(16).substring(2, 6);
-            const shortId = `${prefix}-0x${randomHex}`;
+            const shortId = `0x${randomHex}`;
 
             try {
                 await redis.hset('short_links', { [shortId]: longUrl });
                 const host = req.headers['host'];
                 const protocol = req.headers['x-forwarded-proto'] || 'https';
-                const shortUrl = `${protocol}://${host}/verify/${shortId}`;
-                const maskedUrl = `[nextgenserver.hack/verify/${shortId}](${shortUrl})`;
+                const shortUrl = `${protocol}://${host}/s/${shortId}`;
+                const maskedUrl = `[nextgenserver.hack/s/${shortId}](${shortUrl})`;
 
                 const responseText = `🔗 *HACKER LINK GENERATED* 🔗\n\nOriginal: \`${longUrl}\`\n\n*Shortened:* ${maskedUrl}`;
                 

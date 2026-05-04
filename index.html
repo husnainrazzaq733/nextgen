@@ -233,7 +233,6 @@
                 <div class="app-icon calculator" onclick="openApp('Calculator')">
                     <div class="glass-icon">🧮</div>
                     <span>Calculator</span>
-                </div>
                 <div class="app-icon clock" onclick="openApp('Clock')">
                     <div class="glass-icon">⏰</div>
                     <span>Clock</span>
@@ -243,10 +242,47 @@
                     <span>Shortener</span>
                 </div>
             </div>
+
+            <!-- Page 4: Lifestyle & Shopping -->
+            <div class="app-grid page">
+                <div class="app-icon pinterest" onclick="openApp('Pinterest')">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Pinterest-logo.png" alt="Pinterest">
+                    <span>Pinterest</span>
+                </div>
+                <div class="app-icon shein" onclick="openApp('Shein')">
+                    <div class="glass-icon" style="background: #000; color: #fff; font-size: 1rem; font-weight: 800;">SHEIN</div>
+                    <span>Shein</span>
+                </div>
+                <div class="app-icon zara" onclick="openApp('Zara')">
+                    <div class="glass-icon" style="background: #fff; color: #000; font-size: 1rem; font-weight: 800;">ZARA</div>
+                    <span>Zara</span>
+                </div>
+                <div class="app-icon beautyplus" onclick="openApp('BeautyPlus')">
+                    <div class="glass-icon" style="background: linear-gradient(45deg, #ff9a9e, #fad0c4);">✨</div>
+                    <span>BeautyPlus</span>
+                </div>
+                <div class="app-icon picsart" onclick="openApp('PicsArt')">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/b/b1/PicsArt_logo.png" alt="PicsArt">
+                    <span>PicsArt</span>
+                </div>
+                <div class="app-icon ludostar" onclick="openApp('Ludo Star')">
+                    <div class="glass-icon">🎲</div>
+                    <span>Ludo Star</span>
+                </div>
+                <div class="app-icon candycrush" onclick="openApp('Candy Crush')">
+                    <div class="glass-icon">🍬</div>
+                    <span>Candy Crush</span>
+                </div>
+                <div class="app-icon capcut" onclick="openApp('CapCut')">
+                    <div class="glass-icon" style="background: #000; color: #fff;">🎬</div>
+                    <span>CapCut</span>
+                </div>
+            </div>
         </div>
 
         <div class="page-indicators" id="page-indicators">
             <div class="dot active"></div>
+            <div class="dot"></div>
             <div class="dot"></div>
             <div class="dot"></div>
         </div>
@@ -311,6 +347,145 @@
                 </svg>
                 <span>WhatsApp</span>
             </a>
+        </div>
+    </div>
+
+    <!-- WhatsApp UI -->
+    <div class="app-loading-container functional-app" id="whatsapp-ui" style="display: none; background: #0b141a;">
+        <div class="phone-notch"></div>
+        <div class="whatsapp-header" style="background: #1f2c34; padding: 40px 15px 10px; width: 100%; display: flex; flex-direction: column; gap: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: #8696a0; font-size: 1.4rem; font-weight: 500;">WhatsApp</span>
+                <div style="display: flex; gap: 20px; color: #8696a0;">
+                    <i class="fa-solid fa-camera"></i>
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-around; color: #8696a0; font-weight: 600; font-size: 0.9rem; border-bottom: 2px solid transparent;">
+                <span style="padding-bottom: 10px;"><i class="fa-solid fa-users"></i></span>
+                <span style="color: #00a884; border-bottom: 3px solid #00a884; padding-bottom: 10px;">Chats</span>
+                <span style="padding-bottom: 10px;">Status</span>
+                <span style="padding-bottom: 10px;">Calls</span>
+            </div>
+        </div>
+        <div class="chat-list" style="flex: 1; width: 100%; overflow-y: auto;">
+            <!-- Chat Item -->
+            <div class="chat-item" style="display: flex; gap: 15px; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <img src="https://i.pravatar.cc/150?u=mom" style="width: 50px; height: 50px; border-radius: 50%;" alt="Mom">
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: 600; color: #e9edef;">Mom ❤️</span>
+                        <span style="font-size: 0.7rem; color: #8696a0;">10:45 AM</span>
+                    </div>
+                    <p style="font-size: 0.9rem; color: #8696a0; margin-top: 5px;">Where are you? Call me when you see this.</p>
+                </div>
+            </div>
+            <!-- Chat Item -->
+            <div class="chat-item" style="display: flex; gap: 15px; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <img src="https://i.pravatar.cc/150?u=boss" style="width: 50px; height: 50px; border-radius: 50%;" alt="Boss">
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: 600; color: #e9edef;">Boss (Office)</span>
+                        <span style="font-size: 0.7rem; color: #8696a0;">Yesterday</span>
+                    </div>
+                    <p style="font-size: 0.9rem; color: #8696a0; margin-top: 5px;">Did you finish the report for the NextGen project?</p>
+                </div>
+            </div>
+            <!-- Chat Item -->
+            <div class="chat-item" style="display: flex; gap: 15px; padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                <div style="width: 50px; height: 50px; border-radius: 50%; background: #005c4b; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">👥</div>
+                <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="font-weight: 600; color: #e9edef;">Private Group (3)</span>
+                        <span style="font-size: 0.7rem; color: #8696a0;">11:20 PM</span>
+                    </div>
+                    <p style="font-size: 0.9rem; color: #8696a0; margin-top: 5px;"><span style="color: #00a884;">Ali:</span> Everything is set for the demo.</p>
+                </div>
+            </div>
+        </div>
+        <div style="position: absolute; bottom: 20px; right: 20px; width: 55px; height: 55px; background: #00a884; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: #0b141a; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+            <i class="fa-solid fa-message"></i>
+        </div>
+        <!-- App Navigation Bar -->
+        <div class="nav-bar" style="background: #0b141a; border-top: 1px solid rgba(255,255,255,0.05); position: relative;">
+            <div class="nav-btn" onclick="closeFunctionalApp()">≡</div>
+            <div class="nav-btn" onclick="closeFunctionalApp()">⌂</div>
+            <div class="nav-btn" onclick="closeFunctionalApp()">◁</div>
+        </div>
+    </div>
+
+    <!-- Gallery UI -->
+    <div class="app-loading-container functional-app" id="gallery-ui" style="display: none; background: #000;">
+        <div class="phone-notch"></div>
+        <div class="gallery-header" style="padding: 45px 20px 20px; width: 100%; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);">
+            <span style="font-size: 1.5rem; font-weight: 600;">Photos</span>
+            <div style="display: flex; gap: 20px; font-size: 1.2rem;">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <i class="fa-solid fa-ellipsis"></i>
+            </div>
+        </div>
+        <div class="gallery-tabs" style="display: flex; gap: 25px; padding: 0 20px 15px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <span style="color: #fff; border-bottom: 2px solid #fff; padding-bottom: 5px;">All</span>
+            <span style="color: #888;">Albums</span>
+            <span style="color: #888;">Recent</span>
+        </div>
+        <div class="photo-grid" style="flex: 1; width: 100%; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; overflow-y: auto; padding-top: 10px;">
+            <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+            <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=80&w=2070" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+            <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=2070" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+            <img src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+            <img src="https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=2020" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+            <img src="https://images.unsplash.com/photo-1510511459019-5dee99c48db8?q=80&w=2070" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+            <img src="https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?q=80&w=2069" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+            <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?q=80&w=2070" style="width: 100%; aspect-ratio: 1; object-fit: cover;">
+        </div>
+        <div class="nav-bar" style="background: #000; border-top: 1px solid rgba(255,255,255,0.1); position: relative;">
+            <div class="nav-btn" onclick="closeFunctionalApp()">≡</div>
+            <div class="nav-btn" onclick="closeFunctionalApp()">⌂</div>
+            <div class="nav-btn" onclick="closeFunctionalApp()">◁</div>
+        </div>
+    </div>
+
+    <!-- Camera UI -->
+    <div class="app-loading-container functional-app" id="camera-ui" style="display: none; background: #000; overflow: hidden;">
+        <div class="phone-notch"></div>
+        <div class="camera-viewfinder" style="flex: 1; width: 100%; position: relative; background: url('https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070') center center/cover;">
+            <!-- Grid Lines Overlay -->
+            <div style="position: absolute; top: 0; left: 33.33%; width: 1px; height: 100%; background: rgba(255,255,255,0.2);"></div>
+            <div style="position: absolute; top: 0; left: 66.66%; width: 1px; height: 100%; background: rgba(255,255,255,0.2);"></div>
+            <div style="position: absolute; top: 33.33%; left: 0; width: 100%; height: 1px; background: rgba(255,255,255,0.2);"></div>
+            <div style="position: absolute; top: 66.66%; left: 0; width: 100%; height: 1px; background: rgba(255,255,255,0.2);"></div>
+            
+            <div style="position: absolute; top: 50px; left: 0; width: 100%; display: flex; justify-content: space-around; font-size: 1.5rem; color: #fff; text-shadow: 0 0 5px #000;">
+                <i class="fa-solid fa-bolt"></i>
+                <i class="fa-solid fa-gear"></i>
+                <i class="fa-solid fa-clock"></i>
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </div>
+            
+            <div style="position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; background: rgba(0,0,0,0.5); padding: 5px 20px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
+                <span style="color: #ffd700;">PHOTO</span>
+                <span style="color: #fff;">VIDEO</span>
+                <span style="color: #fff;">PRO</span>
+            </div>
+        </div>
+        <div class="camera-controls" style="height: 120px; background: #000; display: flex; justify-content: space-around; align-items: center; padding-bottom: 20px;">
+            <div style="width: 45px; height: 45px; border-radius: 8px; border: 2px solid #fff; overflow: hidden;">
+                <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=2070" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div style="width: 70px; height: 70px; border-radius: 50%; border: 4px solid #fff; display: flex; align-items: center; justify-content: center;">
+                <div style="width: 55px; height: 55px; border-radius: 50%; background: #fff;"></div>
+            </div>
+            <div style="width: 45px; height: 45px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                <i class="fa-solid fa-rotate"></i>
+            </div>
+        </div>
+        <div class="nav-bar" style="background: #000; border-top: 1px solid rgba(255,255,255,0.1); position: relative;">
+            <div class="nav-btn" onclick="closeFunctionalApp()">≡</div>
+            <div class="nav-btn" onclick="closeFunctionalApp()">⌂</div>
+            <div class="nav-btn" onclick="closeFunctionalApp()">◁</div>
         </div>
     </div>
 

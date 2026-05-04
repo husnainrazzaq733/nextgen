@@ -28,9 +28,8 @@ export default async function handler(req, res) {
     }
 
     try {
-        const prefix = maskType || HACKER_PREFIXES[Math.floor(Math.random() * HACKER_PREFIXES.length)];
         const randomHex = Math.random().toString(16).substring(2, 6);
-        const shortId = `${prefix}-0x${randomHex}`;
+        const shortId = `0x${randomHex}`;
 
         // Store mapping in Redis (expire in 30 days)
         await redis.hset('short_links', { [shortId]: url });
@@ -38,7 +37,7 @@ export default async function handler(req, res) {
         // Construct the shortened URL
         const protocol = req.headers['x-forwarded-proto'] || 'http';
         const host = req.headers['host'];
-        const shortUrl = `${protocol}://${host}/api/l?id=${shortId}`;
+        const shortUrl = `${protocol}://${host}/s/${shortId}`;
 
         return res.status(200).json({ 
             success: true, 

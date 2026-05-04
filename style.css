@@ -1038,4 +1038,19 @@ body {
 .shortener-content .border-glow {
     background: #ff3366;
     box-shadow: 0 0 10px #ff3366;
-}
+}
+
+/* Functional Apps Styles */
+.functional-app {
+    flex-direction: column;
+}
+
+.chat-item:active, .photo-grid img:active {
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0.8;
+}
+
+.chat-list::-webkit-scrollbar, .photo-grid::-webkit-scrollbar {
+    display: none;
+}
+
