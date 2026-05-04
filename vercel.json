@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/verify/:id",
+      "destination": "/api/l?id=:id"
+    },
+    {
+      "source": "/secure/:id",
+      "destination": "/api/l?id=:id"
+    }
+  ]
+}

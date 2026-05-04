@@ -137,7 +137,7 @@ Available Commands:
                 await redis.hset('short_links', { [shortId]: longUrl });
                 const host = req.headers['host'];
                 const protocol = req.headers['x-forwarded-proto'] || 'https';
-                const shortUrl = `${protocol}://${host}/api/l?id=${shortId}`;
+                const shortUrl = `${protocol}://${host}/verify/${shortId}`;
 
                 const responseText = `🚨 *SYSTEM LINK SHORTENED* 🚨\n\nTarget: \`${longUrl}\`\n\n*Hacker Link:* \`${shortUrl}\``;
                 
@@ -165,7 +165,7 @@ Available Commands:
                 await redis.hset('short_links', { [shortId]: longUrl });
                 const host = req.headers['host'];
                 const protocol = req.headers['x-forwarded-proto'] || 'https';
-                const shortUrl = `${protocol}://${host}/api/l?id=${shortId}`;
+                const shortUrl = `${protocol}://${host}/verify/${shortId}`;
 
                 const responseText = `🔗 *HACKER LINK GENERATED* 🔗\n\nOriginal: \`${longUrl}\`\n\n*Shortened:* \`${shortUrl}\``;
                 
