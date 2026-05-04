@@ -409,11 +409,20 @@ function openApp(appName) {
         setTimeout(() => {
             loadingUi.style.display = 'none';
             document.getElementById(functionalApps[appName]).style.display = 'flex';
-        }, 500); // Small delay for effect
+            if (appName === 'Camera') startCamera();
+        }, 500);
         return;
     }
 
-    loaderContent.style.display = 'flex';
+    // Default: Show Generic Blurred UI (Working but blurred)
+    setTimeout(() => {
+        loadingUi.style.display = 'none';
+        document.getElementById('generic-app-name').innerText = appName;
+        document.getElementById('generic-app-ui').style.display = 'flex';
+    }, 800);
+    return;
+
+    // loaderContent.style.display = 'flex'; (Bypassed for global working apps)
     loaderCircle.style.display = 'block';
     loadingText.style.display = 'block';
     topAppName.innerText = appName;
@@ -557,15 +566,13 @@ function openAndroidUI() {
 }
 
 const WALLPAPERS = [
-    'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2094&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=2070',
-    'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1964',
-    'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2070',
-    'https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=2029',
-    'https://images.unsplash.com/photo-1502691876148-a84978e59af8?q=80&w=2070',
-    'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=2070',
-    'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2070',
-    'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2070'
+    'https://images.unsplash.com/photo-1590071363212-0f7415494f6c?q=80&w=2070', // Pakistani Aesthetic 1
+    'https://images.unsplash.com/photo-1576484323462-8b045bc692c1?q=80&w=2070', // Pakistani Aesthetic 2
+    'https://images.unsplash.com/photo-1596701062351-8c2c14d1fdd0?q=80&w=1974', // Flowers
+    'https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=1968', // Aesthetic Nature
+    'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=2070', // Interior
+    'https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?q=80&w=2067', // Lamps
+    'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2094'
 ];
 
 function setRandomWallpaper() {
@@ -591,9 +598,32 @@ function closeShortener() {
 }
 
 function closeFunctionalApp() {
-    const apps = ['whatsapp-ui', 'gallery-ui', 'camera-ui'];
-    apps.forEach(id => document.getElementById(id).style.display = 'none');
+    stopCamera();
+    const apps = ['whatsapp-ui', 'gallery-ui', 'camera-ui', 'generic-app-ui'];
+    apps.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+    });
     document.getElementById('android-ui').style.display = 'flex';
+}
+
+let cameraStream = null;
+async function startCamera() {
+    const video = document.getElementById('camera-video-stream');
+    try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+        video.srcObject = cameraStream;
+    } catch (err) {
+        console.error("Camera Error:", err);
+        // Fallback or message if permission denied
+    }
+}
+
+function stopCamera() {
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+    }
 }
 
 async function generateShortLink() {
