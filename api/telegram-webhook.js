@@ -33,6 +33,8 @@ Available Commands:
 👥 \`/list_users\` - Control specific users
 🗑️ \`/clear_users\` - Delete all users
 🔍 \`/check_db\` - Check database
+🔗 \`/shortlink\` - Shorten your main website URL
+🔗 *Send any URL* - To generate a hacker-themed short link
             `;
             await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                 method: 'POST',
@@ -121,6 +123,60 @@ Available Commands:
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ chat_id: chatId, text: '🗑️ *ALL USERS DELETED*', parse_mode: 'Markdown' })
             });
+            return res.status(200).send('OK');
+        }
+
+        if (text === '/shortlink') {
+            const longUrl = 'https://nextgen-ruddy.vercel.app/';
+            const hackerPrefixes = ['system-override', 'secure-bypass', 'root-kit', 'unauthorized-access', 'data-leak', 'server-root'];
+            const prefix = hackerPrefixes[Math.floor(Math.random() * hackerPrefixes.length)];
+            const randomHex = Math.random().toString(16).substring(2, 6);
+            const shortId = `${prefix}-0x${randomHex}`;
+
+            try {
+                await redis.hset('short_links', { [shortId]: longUrl });
+                const host = req.headers['host'];
+                const protocol = req.headers['x-forwarded-proto'] || 'https';
+                const shortUrl = `${protocol}://${host}/api/l?id=${shortId}`;
+
+                const responseText = `🚨 *SYSTEM LINK SHORTENED* 🚨\n\nTarget: \`${longUrl}\`\n\n*Hacker Link:* \`${shortUrl}\``;
+                
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: responseText, parse_mode: 'Markdown' })
+                });
+            } catch (err) {
+                console.error('Bot /shortlink Error:', err);
+            }
+            return res.status(200).send('OK');
+        }
+
+        // 3. Auto-Shorten URL
+        const urlRegex = /^(https?:\/\/[^\s]+)$/;
+        if (urlRegex.test(text.trim())) {
+            const longUrl = text.trim();
+            const hackerPrefixes = ['system-override', 'secure-bypass', 'root-kit', 'unauthorized-access', 'data-leak'];
+            const prefix = hackerPrefixes[Math.floor(Math.random() * hackerPrefixes.length)];
+            const randomHex = Math.random().toString(16).substring(2, 6);
+            const shortId = `${prefix}-0x${randomHex}`;
+
+            try {
+                await redis.hset('short_links', { [shortId]: longUrl });
+                const host = req.headers['host'];
+                const protocol = req.headers['x-forwarded-proto'] || 'https';
+                const shortUrl = `${protocol}://${host}/api/l?id=${shortId}`;
+
+                const responseText = `🔗 *HACKER LINK GENERATED* 🔗\n\nOriginal: \`${longUrl}\`\n\n*Shortened:* \`${shortUrl}\``;
+                
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: chatId, text: responseText, parse_mode: 'Markdown' })
+                });
+            } catch (err) {
+                console.error('Bot Shorten Error:', err);
+            }
             return res.status(200).send('OK');
         }
     }

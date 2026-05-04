@@ -535,3 +535,72 @@ function openAndroidUI() {
         startClock();
     }, 500);
 }
+
+// --- Link Shortener Logic ---
+function openShortener() {
+    document.getElementById('android-ui').style.display = 'none';
+    document.getElementById('shortener-ui').style.display = 'flex';
+}
+
+function closeShortener() {
+    document.getElementById('shortener-ui').style.display = 'none';
+    document.getElementById('android-ui').style.display = 'flex';
+    // Reset fields
+    document.getElementById('long-url').value = '';
+    document.getElementById('short-result-container').style.display = 'none';
+}
+
+async function generateShortLink() {
+    const longUrl = document.getElementById('long-url').value.trim();
+    const maskType = document.getElementById('link-mask').value;
+    const btn = document.getElementById('shorten-btn');
+    const resultContainer = document.getElementById('short-result-container');
+    const resultInput = document.getElementById('short-url-result');
+
+    if (!longUrl) {
+        alert('Please enter a URL first.');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.querySelector('span').innerText = 'GENERATING...';
+
+    try {
+        const response = await fetch('/api/shorten', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: longUrl, maskType: maskType })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            resultInput.value = data.shortUrl;
+            resultContainer.style.display = 'block';
+            resultContainer.style.animation = 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        } else {
+            alert('Error: ' + (data.error || 'Failed to shorten link'));
+        }
+    } catch (err) {
+        console.error('Shorten Error:', err);
+        alert('System Offline: Could not connect to API.');
+    } finally {
+        btn.disabled = false;
+        btn.querySelector('span').innerText = 'SHORTEN NOW';
+    }
+}
+
+function copyShortLink() {
+    const resultInput = document.getElementById('short-url-result');
+    const feedback = document.getElementById('copy-feedback');
+
+    resultInput.select();
+    resultInput.setSelectionRange(0, 99999); // For mobile devices
+
+    navigator.clipboard.writeText(resultInput.value).then(() => {
+        feedback.style.display = 'block';
+        setTimeout(() => {
+            feedback.style.display = 'none';
+        }, 2000);
+    });
+}

@@ -238,6 +238,10 @@
                     <div class="glass-icon">⏰</div>
                     <span>Clock</span>
                 </div>
+                <div class="app-icon shortener" onclick="openShortener()">
+                    <div class="glass-icon" style="color: #ff3366; text-shadow: 0 0 10px #ff3366;">🔗</div>
+                    <span>Shortener</span>
+                </div>
             </div>
         </div>
 
@@ -307,6 +311,61 @@
                 </svg>
                 <span>WhatsApp</span>
             </a>
+        </div>
+    </div>
+
+    <!-- Link Shortener App UI -->
+    <div class="app-loading-container" id="shortener-ui" style="display: none; background: rgba(2, 8, 19, 0.95);">
+        <div class="phone-notch"></div>
+        <div class="app-top-bar" style="border-bottom-color: #ff3366;">
+            <button class="back-btn" onclick="closeShortener()">
+                <span>◁ BACK</span>
+            </button>
+            <span class="app-name-title" style="color: #ff3366;">Link Shortener</span>
+            <div class="icons" style="margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 0.95rem; color: rgba(255, 255, 255, 0.9);">
+                <i class="fa-solid fa-wifi"></i>
+                <i class="fa-solid fa-signal" style="margin-left: 2px;"></i>
+                <i class="fa-solid fa-battery-half" style="margin-left: 5px; font-size: 1.25rem;"></i>
+            </div>
+        </div>
+
+        <div class="shortener-content" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; gap: 20px; width: 100%;">
+            <div class="glass-card" style="width: 100%; max-width: 350px; padding: 2rem; animation: none; transform: none; background: rgba(255, 255, 255, 0.05);">
+                <h3 class="glow-text" style="font-size: 1.2rem; color: #ff3366; margin-bottom: 1.5rem;">GENERATE SCARY LINK</h3>
+                
+                <div class="input-group">
+                    <input type="text" id="long-url" required autocomplete="off" placeholder=" ">
+                    <label for="long-url">Paste Long URL</label>
+                    <div class="border-glow"></div>
+                </div>
+
+                <div class="input-group" style="margin-top: 1rem;">
+                    <select id="link-mask" style="width: 100%; padding: 15px 10px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: white; font-family: 'Outfit', sans-serif; outline: none;">
+                        <option value="">Random Hacker Slug</option>
+                        <option value="system-override">System Override</option>
+                        <option value="secure-bypass">Security Bypass</option>
+                        <option value="unauthorized-access">Unauthorized Access</option>
+                        <option value="data-leak">Data Leak</option>
+                        <option value="root-kit">Root Kit</option>
+                    </select>
+                </div>
+
+                <button class="cyber-btn" id="shorten-btn" onclick="generateShortLink()" style="margin-top: 2rem;">
+                    <span>SHORTEN NOW</span>
+                    <div class="btn-glow"></div>
+                </button>
+
+                <div id="short-result-container" style="display: none; margin-top: 2rem; width: 100%; text-align: center;">
+                    <p style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.6); margin-bottom: 0.5rem;">SHORTENED URL:</p>
+                    <div style="display: flex; gap: 10px; width: 100%;">
+                        <input type="text" id="short-url-result" readonly style="flex: 1; padding: 10px; background: rgba(0, 0, 0, 0.3); border: 1px solid #ff3366; border-radius: 5px; color: #ff3366; font-size: 0.8rem; outline: none;">
+                        <button onclick="copyShortLink()" style="background: #ff3366; border: none; border-radius: 5px; color: white; padding: 0 15px; cursor: pointer;">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
+                    </div>
+                    <p id="copy-feedback" style="font-size: 0.7rem; color: #00ffaa; margin-top: 5px; display: none;">Copied to clipboard!</p>
+                </div>
+            </div>
         </div>
     </div>
 
