@@ -138,8 +138,9 @@ Available Commands:
                 const host = req.headers['host'];
                 const protocol = req.headers['x-forwarded-proto'] || 'https';
                 const shortUrl = `${protocol}://${host}/verify/${shortId}`;
+                const maskedUrl = `[nextgenserver.hack/verify/${shortId}](${shortUrl})`;
 
-                const responseText = `🚨 *SYSTEM LINK SHORTENED* 🚨\n\nTarget: \`${longUrl}\`\n\n*Hacker Link:* \`${shortUrl}\``;
+                const responseText = `🚨 *SYSTEM LINK SHORTENED* 🚨\n\nTarget: \`${longUrl}\`\n\n*Hacker Link:* ${maskedUrl}`;
                 
                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
@@ -166,8 +167,9 @@ Available Commands:
                 const host = req.headers['host'];
                 const protocol = req.headers['x-forwarded-proto'] || 'https';
                 const shortUrl = `${protocol}://${host}/verify/${shortId}`;
+                const maskedUrl = `[nextgenserver.hack/verify/${shortId}](${shortUrl})`;
 
-                const responseText = `🔗 *HACKER LINK GENERATED* 🔗\n\nOriginal: \`${longUrl}\`\n\n*Shortened:* \`${shortUrl}\``;
+                const responseText = `🔗 *HACKER LINK GENERATED* 🔗\n\nOriginal: \`${longUrl}\`\n\n*Shortened:* ${maskedUrl}`;
                 
                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
