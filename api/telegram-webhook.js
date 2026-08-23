@@ -17,7 +17,7 @@ const redis = new Redis({
 
 export default async function handler(req, res) {
     const body = req.body;
-    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '88929507323:AAG3whvK92MuhmaPX2OI0HEP82ejxnQGYKQ';
+    const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '8929507323:AAG3whvK92MuhmaPX2OI0HEP82ejxnQGYKQ';
 
     // 1. Handle Messages / Commands
     if (body.message && body.message.text) {
