@@ -1,5 +1,5 @@
 // Initialize Pusher
-const PUSHER_KEY = '5628e828c0ecf46c7de1'; 
+const PUSHER_KEY = '57e6b29567220f212fe5'; 
 const PUSHER_CLUSTER = 'ap1';
 
 const pusher = new Pusher(PUSHER_KEY, {

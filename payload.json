@@ -1,1 +1,1 @@
-{"callback_query": {"data": "ctrl_testuser", "message": {"chat": {"id": 5290622641}}}}
+{"message": {"text": "/list_users", "chat": {"id": 5290622641}}}

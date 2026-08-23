@@ -3,9 +3,9 @@ const { Redis } = require('@upstash/redis');
 const fetch = require('node-fetch');
 
 const pusher = new Pusher({
-    appId: process.env.PUSHER_APP_ID || '2149356',
-    key: process.env.PUSHER_KEY || '5628e828c0ecf46c7de1',
-    secret: process.env.PUSHER_SECRET || 'c3f522d273a4f329faa3',
+    appId: process.env.PUSHER_APP_ID || '2188434',
+    key: process.env.PUSHER_KEY || '57e6b29567220f212fe5',
+    secret: process.env.PUSHER_SECRET || '718c26f8c4ba7bc94948',
     cluster: process.env.PUSHER_CLUSTER || 'ap1',
     useTLS: true
 });
